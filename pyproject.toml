@@ -12,7 +12,7 @@ packages = [
 pyre = "pyre.cli.main:app"
 
 [tool.poetry.dependencies]
-python = ">=3.12,<4"
+python = ">=3.11,<4"
 numpy = "^1.26.4"
 pandas = "^2.2.2"
 typer = "^0.12.3"
