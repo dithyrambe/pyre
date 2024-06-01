@@ -1,5 +1,5 @@
-from rich.progress import track
 from pendulum import Date
+from rich.progress import track
 import numpy as np
 import pandas as pd
 
@@ -15,22 +15,24 @@ class MonteCarloSimulation:
     def run(self, seed: float, start_date: Date, end_date: Date, n: int = 1, progress: bool = False):
         date_range = (end_date.subtract(days=1) - start_date).range("days")
         dates = [*date_range]
-        _range = range(n)
-        if progress:
-            _range = track(_range, total=n, description="Simulating...")
-        simulations = [self.simulate(seed=seed, dates=dates) for _ in _range]
-        return pd.concat(simulations, axis=1)
 
-
-    def simulate(self, seed: float, dates: list[Date]) -> pd.Series:
-        principals = [seed]
         mean = self.index.get_variation_mean()
         std = self.index.get_variation_std()
+        variations = np.random.normal(loc=mean, scale=std, size=(len(dates), n))
+        return self.simulate(seed=seed, dates=dates, variations=variations, progress=progress)
 
-        variations = np.random.normal(loc=mean, scale=std, size=len(dates))
-        for date, variation in zip(dates, variations):
-            new_principal = self.strategy.execute(dt=date, principal=principals[-1])
-            new_principal *= 1 + variation
-            principals.append(new_principal)
 
-        return pd.Series(principals[1:], index=pd.Index(dates, name="date"))
+    def simulate(self, seed: float, dates: list[Date], variations: np.ndarray, progress: bool = False) -> pd.DataFrame:
+        principals = seed * np.ones(variations.shape[1])
+        _principals = np.ones_like(variations)
+        iterator = enumerate(zip(dates, variations))
+        if progress:
+            iterator = track(iterator, total=len(dates), description="Simulating")
+
+        for i, (date, variation) in iterator:
+            new_principals = self.strategy.execute(dt=date, principal=principals)
+            new_principals *= 1 + variation
+            _principals[i] *= new_principals
+            principals = new_principals
+
+        return pd.DataFrame(_principals, index=pd.Index(dates, name="date"))

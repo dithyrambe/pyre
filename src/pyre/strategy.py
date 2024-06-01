@@ -1,4 +1,7 @@
+from typing import Union
+
 from pendulum import Date
+import numpy as np
 
 def is_between(dt: Date, start_date: Date, end_date: Date) -> bool:
     return dt >= start_date and dt < end_date
@@ -24,7 +27,7 @@ class MonthlyDCA(Strategy):
         self.amount = amount
         self.payments = []
 
-    def execute(self, dt: Date, principal: float) -> float:
+    def execute(self, dt: Date, principal: Union[float, np.ndarray]) -> float:
         if is_between(dt, self.start_date, self.end_date) and dt.is_same_day(dt.start_of("month")):
             self.payments.append({"dt": self.amount})
             return principal + self.amount
