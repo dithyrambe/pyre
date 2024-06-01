@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "pyre"
+version = "0.1.0"
+description = "FIRE with python"
+authors = ["dithyrambe <dithyrambe@outlook.fr>"]
+readme = "README.md"
+packages = [
+  {include = "pyre", from = "src"}
+]
+
+[tool.poetry.scripts]
+pyre = "pyre.cli.main:app"
+
+[tool.poetry.dependencies]
+python = ">=3.12,<4"
+numpy = "^1.26.4"
+pandas = "^2.2.2"
+typer = "^0.12.3"
+nicegui = {extras = ["highcharts"], version = "^1.4.24"}
+pendulum = "^3.0.0"
+yfinance = "^0.2.40"
+
+[tool.poetry.group.dev.dependencies]
+ipython = "^8.22.1"
+pytest = "^8.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry-dynamic-versioning]
+enable = true
+pattern  = "^(?P<base>\\d+\\.\\d+\\.\\d+)(-?((?P<stage>[a-zA-Z]+)\\.?(?P<revision>\\d+)?))?"
+
+[tool.ruff]
+line-length = 100
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
