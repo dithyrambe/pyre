@@ -37,6 +37,8 @@ def dca(
 
     _quantiles = np.quantile(principals, q=[0.1, 0.5, 0.9], axis=1)
     quantiles = pd.DataFrame(_quantiles.T, columns=["p10", "p50", "p90"], index=pd.Index(dates, name="date"))
+    quantiles = quantiles.join(dca.payments)
+    quantiles["savings"] = quantiles["savings"].fillna(0).cumsum() + seed
 
     table = quantiles.map(lambda x: f"€{x:,.0f}").reset_index()
     table = table.groupby(pd.to_datetime(table["date"]).dt.year).last()
@@ -44,8 +46,8 @@ def dca(
 
     if not quiet:
         if graph:
-            plot(quantiles, colors=["red", "yellow", "green"])
+            plot(quantiles, colors=["red", "yellow", "green", None])
 
-        render_table(table, colors=[None, "red", "yellow", "green"])
+        render_table(table, colors=[None, "red", "yellow", "green", None])
     else:
         typer.echo(table.to_csv(sep="\t"))
