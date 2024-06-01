@@ -1,7 +1,8 @@
+import pandas as pd
 from typer import Typer
 import typer
 
-from pyre.cli.helpers import get_date_boundaries
+from pyre.cli.helpers import get_date_boundaries, plot, render_table
 from pyre.constants import ORIGIN
 from pyre.index import Index
 from pyre.monte_carlo import MonteCarloSimulation
@@ -20,6 +21,8 @@ def dca(
     end_date: str = typer.Option(None, help="Date to start simulations"),
     duration: int = typer.Option(10, help="Duration of the simulation in years (ignore if --end-date is passed)"),
     n_sim: int = typer.Option(100, "-n", "--n-sim", help="Number of simulations to draw"),
+    graph: bool = typer.Option(False, help="Wether to plot graph"),
+    quiet: bool = typer.Option(False, help="Plot raw text")
 ) -> None:
     _start_date, _end_date = get_date_boundaries(start_date, end_date, duration)
 
@@ -30,4 +33,17 @@ def dca(
     simulations = monte_carlo.run(
         seed=seed, start_date=_start_date, end_date=_end_date, n=n_sim, progress=True
     )
-    typer.echo(simulations.quantile([0.1, 0.25, 0.5, 0.75, 0.9], axis=1).T.tail(1))
+    quantiles = simulations.quantile([0.1, 0.5, 0.9], axis=1).T
+    quantiles.columns = ["p10", "p50", "p90"]
+
+    table = quantiles.map(lambda x: f"€{x:,.0f}").reset_index()
+    table = table.groupby(pd.to_datetime(table["date"]).dt.year).last()
+    table["date"] = table["date"].map(lambda x: f"{x}")
+
+    if not quiet:
+        if graph:
+            plot(quantiles, colors=["red", "yellow", "green"])
+
+        render_table(table, colors=[None, "red", "yellow", "green"])
+    else:
+        typer.echo(table.to_csv(sep="\t"))
