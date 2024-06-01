@@ -27,6 +27,7 @@ def plot(df: pd.DataFrame, colors: Optional[List[str]] = None) -> None:
     _colors = iter(colors) if colors is not None else cycle(["red", "yellow", "green", "blue"])
 
     fig = plotille.Figure()
+    fig.width = 120
     for col in df.columns:
         fig.plot(df.index, df[col], lc=next(_colors), label=col)
     fig.x_label = df.index.name
