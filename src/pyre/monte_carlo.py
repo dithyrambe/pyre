@@ -19,7 +19,7 @@ class MonteCarloSimulation:
         mean = self.index.get_variation_mean()
         std = self.index.get_variation_std()
         variations = np.random.normal(loc=mean, scale=std, size=(len(dates), n))
-        return self.simulate(seed=seed, dates=dates, variations=variations, progress=progress)
+        return dates, self.simulate(seed=seed, dates=dates, variations=variations, progress=progress)
 
 
     def simulate(self, seed: float, dates: list[Date], variations: np.ndarray, progress: bool = False) -> pd.DataFrame:
@@ -35,4 +35,4 @@ class MonteCarloSimulation:
             _principals[i] *= new_principals
             principals = new_principals
 
-        return pd.DataFrame(_principals, index=pd.Index(dates, name="date"))
+        return np.row_stack(_principals)

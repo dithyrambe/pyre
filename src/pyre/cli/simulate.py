@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from typer import Typer
 import typer
@@ -30,11 +31,12 @@ def dca(
     idx.get_historical_data(start_date=ORIGIN)
     dca = MonthlyDCA(start_date=_start_date, end_date=_end_date, amount=amount)
     monte_carlo = MonteCarloSimulation(index=idx, strategy=dca)
-    simulations = monte_carlo.run(
+    dates, principals = monte_carlo.run(
         seed=seed, start_date=_start_date, end_date=_end_date, n=n_sim, progress=not quiet
     )
-    quantiles = simulations.quantile([0.1, 0.5, 0.9], axis=1).T
-    quantiles.columns = ["p10", "p50", "p90"]
+
+    _quantiles = np.quantile(principals, q=[0.1, 0.5, 0.9], axis=1)
+    quantiles = pd.DataFrame(_quantiles.T, columns=["p10", "p50", "p90"], index=pd.Index(dates, name="date"))
 
     table = quantiles.map(lambda x: f"€{x:,.0f}").reset_index()
     table = table.groupby(pd.to_datetime(table["date"]).dt.year).last()
