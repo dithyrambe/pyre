@@ -31,7 +31,7 @@ def dca(
     dca = MonthlyDCA(start_date=_start_date, end_date=_end_date, amount=amount)
     monte_carlo = MonteCarloSimulation(index=idx, strategy=dca)
     simulations = monte_carlo.run(
-        seed=seed, start_date=_start_date, end_date=_end_date, n=n_sim, progress=True
+        seed=seed, start_date=_start_date, end_date=_end_date, n=n_sim, progress=not quiet
     )
     quantiles = simulations.quantile([0.1, 0.5, 0.9], axis=1).T
     quantiles.columns = ["p10", "p50", "p90"]
