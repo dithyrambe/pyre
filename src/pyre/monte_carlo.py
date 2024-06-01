@@ -18,7 +18,7 @@ class MonteCarloSimulation:
         _range = range(n)
         if progress:
             _range = track(_range, total=n, description="Simulating...")
-        simulations = [pd.Series(self.simulate(seed=seed, dates=dates), index=dates) for _ in _range]
+        simulations = [self.simulate(seed=seed, dates=dates) for _ in _range]
         return pd.concat(simulations, axis=1)
 
 
@@ -33,4 +33,4 @@ class MonteCarloSimulation:
             new_principal *= 1 + variation
             principals.append(new_principal)
 
-        return pd.Series(principals[1:], index=dates)
+        return pd.Series(principals[1:], index=pd.Index(dates, name="date"))
