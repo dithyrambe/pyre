@@ -30,7 +30,7 @@ class MonteCarloSimulation:
             iterator = track(iterator, total=len(dates), description="Simulating")
 
         for i, (date, variation) in iterator:
-            new_principals = self.strategy.execute(dt=date, principal=principals)
+            new_principals = self.strategy.execute(date=date, principal=principals)
             new_principals *= 1 + variation
             _principals[i] *= new_principals
             principals = new_principals
