@@ -1,0 +1,28 @@
+name: Run tests
+
+on:
+  workflow_call:
+
+jobs:
+  test-poetry-project:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.11
+
+    - name: Install poetry
+      run: curl -sSL https://install.python-poetry.org | python - --version 1.8.3
+
+    - name: Install dependencies
+      working-directory: ${{ inputs.project-path }}
+      run: poetry install
+        
+    - name: Run tests with pytest
+      working-directory: ${{ inputs.project-path }}
+      run: poetry run pytest .
+
