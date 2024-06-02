@@ -8,8 +8,6 @@ on:
 jobs:
   tests:
     name: Test component
-    needs:
-      - extract-info
     uses: ./.github/workflows/reusable-tests.yaml
 
   docker:

@@ -11,3 +11,14 @@ jobs:
   tests:
     name: Tests
     uses: ./.github/workflows/reusable-tests.yaml
+
+  docker:
+    name: Build and push component
+    needs:
+      - tests
+    uses: ./.github/workflows/reusable-docker.yaml
+    secrets: inherit
+    with:
+      image-name: "pyre"
+      image-tag: "test"
+      push: false
