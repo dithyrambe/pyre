@@ -1,0 +1,24 @@
+name: Tag component
+on: 
+  workflow_dispatch:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  tests:
+    name: Test component
+    needs:
+      - extract-info
+    uses: ./.github/workflows/reusable-tests.yaml
+
+  docker:
+    name: Build and push component
+    needs:
+      - tests
+    uses: ./.github/workflows/reusable-docker.yaml
+    secrets: inherit
+    with:
+      image-name: "pyre"
+      image-tag: "${{ github.ref_name }}"
+      push: true
