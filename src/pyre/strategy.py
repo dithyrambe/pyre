@@ -14,7 +14,7 @@ class Strategy:
         self.start_date = start_date
         self.end_date = end_date
 
-    def execute(self, dt: Date, principal: float) -> float:
+    def execute(self, date: Date, principal: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         raise NotImplementedError()
 
 
@@ -29,9 +29,9 @@ class MonthlyDCA(Strategy):
         self.amount = amount
         self._payments = []
 
-    def execute(self, dt: Date, principal: Union[float, np.ndarray]) -> float:
-        if is_between(dt, self.start_date, self.end_date) and dt.is_same_day(dt.start_of("month")):
-            self._payments.append({"date": dt, "savings": self.amount})
+    def execute(self, date: Date, principal: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+        if is_between(date, self.start_date, self.end_date) and date.is_same_day(date.start_of("month")):
+            self._payments.append({"date": date, "savings": self.amount})
             return principal + self.amount
         return principal
     
