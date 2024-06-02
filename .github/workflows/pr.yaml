@@ -1,0 +1,13 @@
+name: PR job
+on: 
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  tests:
+    name: Tests
+    uses: ./.github/workflows/reusable-tests.yaml
