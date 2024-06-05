@@ -20,6 +20,9 @@ nicegui = {extras = ["highcharts"], version = "^1.4.24"}
 pendulum = "^3.0.0"
 yfinance = "^0.2.40"
 plotille = "^5.0.0"
+sqlalchemy = "^2.0.30"
+psycopg2-binary = "^2.9.9"
+pyyaml = "^6.0.1"
 
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.22.1"

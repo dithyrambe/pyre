@@ -3,8 +3,8 @@ from rich.progress import track
 import numpy as np
 import pandas as pd
 
-from pyre.index import Index
-from pyre.strategy import Strategy
+from pyre.simulation.index import Index
+from pyre.simulation.strategy import Strategy
 
 
 class MonteCarloSimulation:

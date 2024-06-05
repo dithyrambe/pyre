@@ -1,0 +1,19 @@
+investments:
+  - id: 1
+    datetime: "2024-05-15T12:00:00"
+    ticker: "WPEA.PA"
+    quantity: 100
+    price: 5.000
+    fees: 0.0
+  - id: 2
+    datetime: "2024-05-30T12:00:00"
+    ticker: "WPEA.PA"
+    quantity: 1993
+    price: 5.020
+    fees: 0.0
+  - id: 3
+    datetime: "2024-05-30T12:00:00"
+    ticker: "AAPL"
+    quantity: 300
+    price: 200
+    fees: 0.0
