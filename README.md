@@ -9,6 +9,18 @@ Installation
 poetry install
 ```
 
+Portfolio monitoring
+====================
+
+A sample compose stack is available in `./docker-compose` directory.
+A sample market order investment simulation is provided in `./docker-compose/config/investments_sample.yaml`
+
+If you want the example to suit your need, edit this file with your market orders data.
+
+Then
+ - run `cd ./docker-compose && docker compose up -d`
+ - navigate to http://localhost:3000/d/pyre-dashboard/pyre?orgId=1&refresh=auto&from=now%2Fd%2B9h&to=now
+ - default grafana credentials are `admin` both for username and password
 
 Usage
 =====

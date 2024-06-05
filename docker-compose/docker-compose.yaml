@@ -1,0 +1,54 @@
+services:
+  app:
+    image: dithyrambe/pyre
+    build: ..
+    container_name: app
+    environment:
+      PYRE_DB_URL: "postgre:5432/pyre"
+      PYRE_DB_USER: "pyre"
+      PYRE_DB_PASSWORD: "pyre"
+      PYRE_INVESTMENTS_FILE: "/config/investments_sample.yaml"
+      PYRE_POLLING_INTERVAL: "300"
+    command: ["db", "start", "--setup"]
+    volumes:
+      - ./config:/config
+    depends_on:
+      postgre:
+        condition: service_healthy
+    restart: always
+
+  postgre:
+    image: postgres:latest
+    container_name: postgre
+    hostname: postgre
+    environment:
+      POSTGRES_USER: "pyre"
+      POSTGRES_PASSWORD: "pyre"
+      POSTGRES_DB: "pyre"
+    volumes:
+      - pyre_postgre:/var/lib/postgresql/data/
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: "grafana"
+    environment:
+      PYRE_DB_URL: "postgre:5432"
+      PYRE_DB_NAME: "pyre"
+      PYRE_DB_USER: "pyre"
+      PYRE_DB_PASSWORD: "pyre"
+    volumes:
+      - pyre_grafana:/var/lib/grafana
+      - ./provisioning/grafana:/etc/grafana/provisioning
+    ports:
+      - 3000:3000
+
+volumes:
+  pyre_grafana:
+  pyre_postgre:

@@ -2,11 +2,13 @@ from rich.console import Console
 from typer import Typer
 import typer
 
-from pyre.constants import PACKAGE_NAME
+from pyre.simulation.constants import PACKAGE_NAME
+from pyre.cli.db import app as db
 from pyre.cli.simulate import app as simulate
 
 app = Typer(add_completion=False)
 app.add_typer(typer_instance=simulate, name="simulate")
+app.add_typer(typer_instance=db, name="db")
 
 console = Console()
 
@@ -25,6 +27,7 @@ def main(
     ),
 ):
     """Pyre CLI"""
+
 
 
 if __name__ == "__main__":

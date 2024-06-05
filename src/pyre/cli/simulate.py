@@ -4,10 +4,10 @@ from typer import Typer
 import typer
 
 from pyre.cli.helpers import get_date_boundaries, plot, render_table
-from pyre.constants import ORIGIN
-from pyre.index import Index
-from pyre.monte_carlo import MonteCarloSimulation
-from pyre.strategy import MonthlyDCA
+from pyre.simulation.constants import ORIGIN
+from pyre.simulation.index import Index
+from pyre.simulation.monte_carlo import MonteCarloSimulation
+from pyre.simulation.strategy import MonthlyDCA
 
 
 app = Typer(add_completion=False)
