@@ -1,7 +1,7 @@
 import pendulum
 import pytest
 
-from pyre.strategy import MonthlyDCA
+from pyre.simulation.strategy import MonthlyDCA
 
 
 @pytest.mark.parametrize(
