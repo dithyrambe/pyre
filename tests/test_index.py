@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from pyre.constants import ORIGIN
-from pyre.index import Index
+from pyre.simulation.constants import ORIGIN
+from pyre.simulation.index import Index
 
 
 @pytest.fixture()
@@ -16,7 +16,7 @@ def dummy_index_data():
     )
 
 
-@patch("pyre.index.yf.Ticker.history")
+@patch("pyre.simulation.index.yf.Ticker.history")
 def test_date_range_index(history: MagicMock, dummy_index_data: pd.DataFrame):
     history.return_value = dummy_index_data
 
@@ -26,7 +26,7 @@ def test_date_range_index(history: MagicMock, dummy_index_data: pd.DataFrame):
     pd.testing.assert_index_equal(idx.data.index, pd.date_range("2023-01-02", "2023-01-05"))
 
 
-@patch("pyre.index.yf.Ticker.history")
+@patch("pyre.simulation.index.yf.Ticker.history")
 def test_interpolate(history: MagicMock, dummy_index_data: pd.DataFrame):
     history.return_value = dummy_index_data
 
@@ -43,7 +43,7 @@ def test_interpolate(history: MagicMock, dummy_index_data: pd.DataFrame):
     )
 
 
-@patch("pyre.index.yf.Ticker.history")
+@patch("pyre.simulation.index.yf.Ticker.history")
 def test_variations(history: MagicMock, dummy_index_data: pd.DataFrame):
     history.return_value = dummy_index_data
 
@@ -55,7 +55,7 @@ def test_variations(history: MagicMock, dummy_index_data: pd.DataFrame):
     )
 
 
-@patch("pyre.index.yf.Ticker.history")
+@patch("pyre.simulation.index.yf.Ticker.history")
 def test_variation_mean(history: MagicMock, dummy_index_data: pd.DataFrame):
     history.return_value = dummy_index_data
 
@@ -64,7 +64,7 @@ def test_variation_mean(history: MagicMock, dummy_index_data: pd.DataFrame):
     assert idx.get_variation_mean() == np.mean([1, 1/2, 1/3])
 
 
-@patch("pyre.index.yf.Ticker.history")
+@patch("pyre.simulation.index.yf.Ticker.history")
 def test_variation_std(history: MagicMock, dummy_index_data: pd.DataFrame):
     history.return_value = dummy_index_data
 

@@ -2,7 +2,7 @@ from pathlib import Path
 import pytest
 
 import pandas as pd
-from pyre.index import Index
+from pyre.simulation.index import Index
 
 
 @pytest.fixture()
