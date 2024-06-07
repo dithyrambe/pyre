@@ -18,7 +18,7 @@ A sample market order investment simulation is provided in `./docker-compose/con
 If you want the example to suit your need, edit this file with your market orders data.
 
 Then
- - run `cd ./docker-compose && docker compose up -d`
+ - run `cd ./docker-compose && docker compose up -d --build`
  - navigate to http://localhost:3000/d/pyre-dashboard/pyre?orgId=1&refresh=auto&from=now%2Fd%2B9h&to=now
  - default grafana credentials are `admin` both for username and password
 
