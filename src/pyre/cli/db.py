@@ -18,6 +18,9 @@ from pyre.db.engine import create_engine
 from pyre.db.schemas import Investment, StockData
 from pyre.exceptions import PyreException
 
+
+ORDERS_KEY = "orders"
+
 class TimePeriod(str, Enum):
     ONE_DAY = "1d"
     FIVE_DAYS = "5d"
@@ -162,7 +165,7 @@ def bulk(
                 price=float(record["price"]),
                 fees=float(record["fees"]),
             )
-            for record in data["investments"]
+            for record in data[ORDERS_KEY]
         ]
 
     engine = create_engine()
@@ -197,6 +200,33 @@ def list() -> None:
 
 
 @order.command()
+def dump(output: Optional[str] = typer.Option(None, "-o", "--output", help="Output location to dump yaml")) -> None:
+    """Dump all orders (for backup purposes)"""
+    engine = create_engine()
+    with Session(engine) as session:
+        stmt = select(Investment)
+        results = session.execute(stmt)
+        orders = {
+            "orders": [
+                {
+                    "id": order.id,
+                    "datetime": pendulum.parse(f"{order.datetime}").to_iso8601_string(),
+                    "ticker": order.ticker,
+                    "quantity": order.quantity,
+                    "price": order.price,
+                    "fees": order.fees
+                }
+                for order, in results
+            ]
+        }
+        if output:
+            with open(output, "w") as f:
+                yaml.safe_dump(f)
+        else:
+            typer.echo(yaml.safe_dump(orders))
+
+
+@order.command()
 def delete(id: int) -> None:
     """Delete an order by its ID"""
     engine = create_engine()
@@ -210,7 +240,7 @@ def delete(id: int) -> None:
 @market.command()
 def refresh(setup: bool = False, forever: bool = False):
     if setup:
-        bulk(config.PYRE_INVESTMENTS_FILE)
+        bulk(config.PYRE_ORDERS_FILE)
         
     engine = create_engine()
     with Session(engine) as session:
