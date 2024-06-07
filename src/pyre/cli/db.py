@@ -1,7 +1,6 @@
 from enum import Enum
 from typing import List, Optional
 from sqlalchemy import select
-import os
 import time
 
 import pandas as pd
@@ -14,6 +13,7 @@ from pyre.cli.helpers import render_table
 from sqlalchemy.orm import Session
 from typer import Typer
 
+from pyre.config import config
 from pyre.db.engine import create_engine
 from pyre.db.schemas import Investment, StockData
 from pyre.exceptions import PyreException
@@ -209,13 +209,8 @@ def delete(id: int) -> None:
 
 @market.command()
 def refresh(setup: bool = False, forever: bool = False):
-    """Refreshes portfolio's market data"""
-    investments_file = os.getenv("PYRE_INVESTMENTS_FILE")
-    if not investments_file:
-        typer.echo("PYRE_INVESTMENTS_FILE env var must be set", err=True)
-        raise typer.Exit(1)
     if setup:
-        bulk(investments_file)
+        bulk(config.PYRE_INVESTMENTS_FILE)
         
     engine = create_engine()
     with Session(engine) as session:
@@ -236,7 +231,7 @@ def refresh(setup: bool = False, forever: bool = False):
         _dump_records(session, records)
 
     while forever:
-        time.sleep(int(os.getenv("PYRE_POLLING_INTERVAL", 86400)))
+        time.sleep(config.PYRE_POLLING_INTERVAL)
         records = _download(
             tickers=[*set(tickers)],
             start_datetime=f"{min_datetime}",

@@ -7,7 +7,7 @@ services:
       PYRE_DB_URL: "postgre:5432/pyre"
       PYRE_DB_USER: "pyre"
       PYRE_DB_PASSWORD: "pyre"
-      PYRE_INVESTMENTS_FILE: "/config/investments_sample.yaml"
+      PYRE_INVESTMENTS_FILE: "/config/orders.yaml"
       PYRE_POLLING_INTERVAL: "600"
     command: ["market", "refresh", "--setup", "--forever"]
     volumes:
