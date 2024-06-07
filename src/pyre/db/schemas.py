@@ -23,7 +23,7 @@ class Investment(Base):
     id = Column(Integer, primary_key=True, index=True)
     datetime = Column(DateTime, index=True)
     ticker = Column(String, index=True)
-    quantity = Column(Integer)
+    quantity = Column(Double)
     price = Column(Double)
     fees = Column(Double)
     

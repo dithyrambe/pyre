@@ -49,6 +49,7 @@ class TimeInterval(str, Enum):
 
 
 COLUMN_MAPPING = {
+    "Date": "datetime",
     "Datetime": "datetime",
     "Ticker": "ticker",
     "Open": "open",
@@ -65,21 +66,28 @@ app.add_typer(typer_instance=market, name="market")
 app.add_typer(typer_instance=order, name="order")
 
 
-def _download(tickers: List[str], start_datetime: Optional[str] = None, end_datetime: Optional[str] = None, period: str = "max", interval: str = None) -> pd.DataFrame:
+def _download(
+    tickers: List[str],
+    start_datetime: Optional[str] = None,
+    end_datetime: Optional[str] = None,
+    period: str = "max", 
+    interval: str = "1d"
+    ) -> pd.DataFrame:
     data = yfinance.download(
         tickers=" ".join(tickers),
         start=start_datetime,
         end=end_datetime,
         period=period,
         interval=interval,
+        ignore_tz=True,
     )
     df = (
         data
-        .stack(future_stack=True)
+        .stack("Ticker", future_stack=True)
         .reset_index()
         .rename(columns=COLUMN_MAPPING)
         .fillna(psycopg2.extensions.AsIs('NULL'))
-        [[*COLUMN_MAPPING.values()]]
+        [[*set(COLUMN_MAPPING.values())]]
     )
     return df.to_dict(orient="records")
 
@@ -100,8 +108,8 @@ def fetch(
     ticker: str,
     start_datetime: Optional[str] = typer.Option(None, help="Start datetime to fetch data from (inclusive)"),
     end_datetime: Optional[str] = typer.Option(None, help="Start datetime to fetch data to (exclusive)"),
-    period: TimePeriod = typer.Option("1d", help="Period of time to fetch data"),
-    interval: TimeInterval = typer.Option("5m", help="Time interval"),
+    period: TimePeriod = typer.Option("1mo", help="Period of time to fetch data"),
+    interval: TimeInterval = typer.Option("1d", help="Time interval"),
 ) -> None:
     """Fetches data for ticker from yahoo finance and store them in DB"""
     if not period and (not start_datetime and not end_datetime):
@@ -216,17 +224,28 @@ def start(setup: bool = False):
     with Session(engine) as session:
         stmt = select(Investment)
         results = session.execute(stmt)
-        tickers = {investment.ticker for investment, in results}
+        tickers, dts = zip(*[(investment.ticker, investment.datetime) for investment, in results])
 
     engine = create_engine()
+    min_datetime = min(dts).date()
+
+    records = _download(
+        tickers=[*set(tickers)],
+        start_datetime=f"{min_datetime}",
+        interval="1d",
+    )
+
+    with Session(engine) as session:
+        _dump_records(session, records)
+
     while True:
         records = _download(
-            tickers=[*tickers] + ["AAPL"],
-            period=TimePeriod("5d"),
-            interval=TimeInterval("5m"),
+            tickers=[*set(tickers)],
+            start_datetime=f"{min_datetime}",
+            interval="1d",
         )
 
         with Session(engine) as session:
             _dump_records(session, records)
-        time.sleep(int(os.getenv("PYRE_POLLING_INTERVAL", 5*60)))
+        time.sleep(int(os.getenv("PYRE_POLLING_INTERVAL", 3600)))
 
