@@ -59,12 +59,8 @@ COLUMN_MAPPING = {
     "Volume": "volume",
 }
 
-app = Typer(add_completion=False)
 market = Typer(add_completion=False)
 order = Typer(add_completion=False)
-app.add_typer(typer_instance=market, name="market")
-app.add_typer(typer_instance=order, name="order")
-
 
 def _download(
     tickers: List[str],
@@ -211,8 +207,9 @@ def delete(id: int) -> None:
         session.commit()
 
 
-@app.command()
-def start(setup: bool = False):
+@market.command()
+def refresh(setup: bool = False, forever: bool = False):
+    """Refreshes portfolio's market data"""
     investments_file = os.getenv("PYRE_INVESTMENTS_FILE")
     if not investments_file:
         typer.echo("PYRE_INVESTMENTS_FILE env var must be set", err=True)
@@ -238,7 +235,8 @@ def start(setup: bool = False):
     with Session(engine) as session:
         _dump_records(session, records)
 
-    while True:
+    while forever:
+        time.sleep(int(os.getenv("PYRE_POLLING_INTERVAL", 86400)))
         records = _download(
             tickers=[*set(tickers)],
             start_datetime=f"{min_datetime}",
@@ -247,5 +245,4 @@ def start(setup: bool = False):
 
         with Session(engine) as session:
             _dump_records(session, records)
-        time.sleep(int(os.getenv("PYRE_POLLING_INTERVAL", 3600)))
 

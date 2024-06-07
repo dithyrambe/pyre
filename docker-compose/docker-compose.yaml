@@ -8,8 +8,8 @@ services:
       PYRE_DB_USER: "pyre"
       PYRE_DB_PASSWORD: "pyre"
       PYRE_INVESTMENTS_FILE: "/config/investments_sample.yaml"
-      PYRE_POLLING_INTERVAL: "300"
-    command: ["db", "start", "--setup"]
+      PYRE_POLLING_INTERVAL: "600"
+    command: ["market", "refresh", "--setup", "--forever"]
     volumes:
       - ./config:/config
     depends_on:

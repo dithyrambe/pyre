@@ -3,12 +3,13 @@ from typer import Typer
 import typer
 
 from pyre.simulation.constants import PACKAGE_NAME
-from pyre.cli.db import app as db
+from pyre.cli.db import market, order
 from pyre.cli.simulate import app as simulate
 
 app = Typer(add_completion=False)
 app.add_typer(typer_instance=simulate, name="simulate")
-app.add_typer(typer_instance=db, name="db")
+app.add_typer(typer_instance=market, name="market")
+app.add_typer(typer_instance=order, name="order")
 
 console = Console()
 
