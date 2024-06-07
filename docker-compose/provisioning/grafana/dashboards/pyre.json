@@ -531,7 +531,7 @@
     ]
   },
   "time": {
-    "from": "now-24h",
+    "from": "now/d+9h",
     "to": "now"
   },
   "timeRangeUpdatedDuringEditOrView": false,
