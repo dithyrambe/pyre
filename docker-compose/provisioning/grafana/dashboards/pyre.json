@@ -1,6 +1,19 @@
 {
   "annotations": {
-    "list": []
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
   },
   "editable": true,
   "fiscalYearStartMonth": 0,
@@ -65,6 +78,7 @@
               "mode": "off"
             }
           },
+          "decimals": 4,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -231,6 +245,7 @@
             "fixedColor": "blue",
             "mode": "thresholds"
           },
+          "decimals": 0,
           "fieldMinMax": true,
           "mappings": [],
           "thresholds": {
@@ -283,7 +298,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "WITH\ncombined AS (\n    SELECT\n        sd.ticker,\n        sd.datetime,\n        sd.close,\n        i.price,\n        i.quantity\n    FROM\n        stock_data sd\n    LEFT JOIN investments i\n        ON sd.ticker = i.ticker AND sd.datetime >= i.datetime\n)\nSELECT\n    ticker,\n    datetime AS time,\n    close * SUM(quantity) - SUM(price * quantity)\nFROM\n    combined\nWHERE $__timeFilter(datetime)\n  AND ticker = $ticker\nGROUP BY \n    ticker,\n    datetime,\n    close\nORDER BY\n    datetime;",
+          "rawSql": "WITH\ncombined AS (\n    SELECT\n        sd.ticker,\n        sd.datetime,\n        sd.close,\n        i.price,\n        i.quantity,\n        i.fees\n    FROM\n        stock_data sd\n    LEFT JOIN investments i\n        ON sd.ticker = i.ticker AND sd.datetime >= i.datetime\n)\nSELECT\n    ticker,\n    datetime AS time,\n    close * SUM(quantity) - SUM(price * quantity + fees)\nFROM\n    combined\nWHERE $__timeFilter(datetime)\n  AND ticker = $ticker\nGROUP BY \n    ticker,\n    datetime,\n    close\nORDER BY\n    datetime;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -318,7 +333,7 @@
             "fixedColor": "text",
             "mode": "fixed"
           },
-          "decimals": 3,
+          "decimals": 4,
           "fieldMinMax": true,
           "mappings": [],
           "thresholds": {
@@ -406,7 +421,7 @@
             "fixedColor": "text",
             "mode": "fixed"
           },
-          "decimals": 3,
+          "decimals": 4,
           "fieldMinMax": true,
           "mappings": [],
           "thresholds": {
@@ -455,7 +470,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT SUM(price * quantity) / sum(quantity)\nFROM investments\nWHERE ticker = $ticker",
+          "rawSql": "SELECT SUM(price * quantity + fees) / sum(quantity)\nFROM investments\nWHERE ticker = $ticker",
           "refId": "A",
           "sql": {
             "columns": [
@@ -516,7 +531,7 @@
     ]
   },
   "time": {
-    "from": "now/d+9h",
+    "from": "now-24h",
     "to": "now"
   },
   "timeRangeUpdatedDuringEditOrView": false,
@@ -524,6 +539,6 @@
   "timezone": "browser",
   "title": "PYRE",
   "uid": "pyre-dashboard",
-  "version": 21,
+  "version": 3,
   "weekStart": ""
 }
