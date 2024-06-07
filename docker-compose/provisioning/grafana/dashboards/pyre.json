@@ -798,14 +798,14 @@
           "type": "grafana-postgresql-datasource",
           "uid": "pyre"
         },
-        "definition": "SELECT DISTINCT ticker FROM investments",
+        "definition": "SELECT ticker \nFROM (SELECT ticker, count(*) from investments GROUP BY ticker ORDER BY 2 DESC)",
         "hide": 0,
         "includeAll": true,
         "label": "ticker",
         "multi": true,
         "name": "ticker",
         "options": [],
-        "query": "SELECT DISTINCT ticker FROM investments",
+        "query": "SELECT ticker \nFROM (SELECT ticker, count(*) from investments GROUP BY ticker ORDER BY 2 DESC)",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -823,6 +823,6 @@
   "timezone": "browser",
   "title": "PYRE",
   "uid": "pyre-dashboard",
-  "version": 11,
+  "version": 4,
   "weekStart": ""
 }
