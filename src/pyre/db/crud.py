@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 from sqlalchemy.orm import Session
 
 from pyre.db.schemas import Order
@@ -19,6 +19,16 @@ def upsert_order(order: Dict, db: Session):
     db.commit()
     db.refresh(order)
     return order
+
+
+def bulk_upsert_order(orders: List[Dict], db: Session):
+    orders = [Order(**data) for data in orders]
+    for order in orders:
+        db.query(Order).filter(
+            Order.id == order.id
+        ).delete()
+        db.add(order)
+    db.commit()
 
 
 def delete_order_by_id(id: int, db: Session):

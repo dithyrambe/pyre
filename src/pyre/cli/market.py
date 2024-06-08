@@ -1,6 +1,5 @@
 from enum import Enum
 from typing import List, Optional
-from sqlalchemy import select
 import time
 
 import pandas as pd
@@ -14,8 +13,6 @@ from pyre.config import config
 from pyre.db.engine import create_engine
 from pyre.db.schemas import Order, StockData
 from pyre.exceptions import PyreException
-from pyre.cli.order import bulk
-
 
 
 class TimePeriod(str, Enum):
@@ -122,36 +119,22 @@ def fetch(
 
 
 @market.command()
-def refresh(setup: bool = False, forever: bool = False):
-    if setup:
-        bulk(config.PYRE_ORDERS_FILE)
-        
+def refresh(forever: bool = False, polling_interval: Optional[int] = None):
     engine = create_engine()
-    with Session(engine) as session:
-        stmt = select(Order)
-        results = session.execute(stmt)
-        tickers, dts = zip(*[(order.ticker, order.datetime) for order, in results])
 
-    engine = create_engine()
-    min_datetime = min(dts).date()
-
-    records = _download(
-        tickers=[*set(tickers)],
-        start_datetime=f"{min_datetime}",
-        interval="1d",
-    )
-
-    with Session(engine) as session:
-        _dump_records(session, records)
-
-    while forever:
-        time.sleep(config.PYRE_POLLING_INTERVAL)
-        records = _download(
-            tickers=[*set(tickers)],
-            start_datetime=f"{min_datetime}",
-            interval="1d",
-        )
-
-        with Session(engine) as session:
-            _dump_records(session, records)
+    while True:
+        with Session(engine) as db:
+            if db.query(Order).first() is not None:
+                results = db.query(Order).all()
+                tickers, dts = zip(*[(order.ticker, order.datetime) for order in results])
+                min_datetime = min(dts).date()
+                records = _download(
+                    tickers=[*set(tickers)],
+                    start_datetime=f"{min_datetime}",
+                    interval="1d",
+                )
+                _dump_records(db, records)
+        if not forever:
+            break
+        time.sleep(polling_interval or config.PYRE_POLLING_INTERVAL)
 
