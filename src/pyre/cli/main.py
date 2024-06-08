@@ -3,7 +3,8 @@ from typer import Typer
 import typer
 
 from pyre.simulation.constants import PACKAGE_NAME
-from pyre.cli.db import market, order
+from pyre.cli.market import market
+from pyre.cli.order import order
 from pyre.cli.simulate import app as simulate
 
 app = Typer(add_completion=False)
