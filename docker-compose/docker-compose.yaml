@@ -14,6 +14,11 @@ services:
       postgre:
         condition: service_healthy
     restart: always
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import socket; s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.settimeout(5); s.connect(('localhost', 8000)); s.close()"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   crawler:
     image: dithyrambe/pyre
@@ -25,10 +30,22 @@ services:
       PYRE_DB_PASSWORD: "pyre"
       PYRE_POLLING_INTERVAL: "30"
     command: ["pyre", "market", "refresh", "--forever"]
+    depends_on:
+      postgre:
+        condition: service_healthy
+    restart: always
+
+  initializer:
+    image: dithyrambe/pyre
+    build: ..
+    container_name: init
+    environment:
+      PYRE_ENDPOINT: "http://api:8000"
+    command: ["pyre", "order", "bulk", "/config/orders.yaml"]
     volumes:
       - ./config:/config
     depends_on:
-      postgre:
+      api:
         condition: service_healthy
     restart: always
 
