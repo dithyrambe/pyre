@@ -44,7 +44,7 @@ def render_table(df: pd.DataFrame, title: Optional[str] = None, colors: Optional
         table.add_column(col, justify="right", style=next(_colors))
 
     for row in df.values:
-        table.add_row(*row)
+        table.add_row(*[f"{_}" for _ in row])
 
     console = Console()
     console.print(table)

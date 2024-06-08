@@ -119,7 +119,11 @@ def fetch(
 
 
 @market.command()
-def refresh(forever: bool = False, polling_interval: Optional[int] = None):
+def refresh(
+    forever: bool = typer.Option(False, help="Whether to crawl forever"), 
+    polling_interval: int = typer.Option(config.PYRE_POLLING_INTERVAL, help="Time interval to fetch data again")
+):
+    """Crawl latest market data"""
     engine = create_engine()
 
     while True:

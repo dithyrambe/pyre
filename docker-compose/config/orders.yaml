@@ -1,19 +1,19 @@
 orders:
   - id: 1
-    datetime: "2024-05-15T12:00:00"
-    ticker: "WPEA.PA"
-    quantity: 100
-    price: 5.000
-    fees: 0.0
-  - id: 2
-    datetime: "2024-05-30T12:00:00"
-    ticker: "WPEA.PA"
-    quantity: 1993
-    price: 5.020
-    fees: 0.0
-  - id: 3
-    datetime: "2024-05-30T12:00:00"
+    datetime: "2020-03-15T12:00:00"
     ticker: "AAPL"
-    quantity: 300
-    price: 200
-    fees: 0.0
+    quantity: 100
+    price: 57.000
+    fees: 12.0
+  - id: 2
+    datetime: "2021-05-21T00:00:00"
+    ticker: "AAPL"
+    quantity: 100
+    price: 127.000
+    fees: 30.0
+  - id: 3
+    datetime: "2021-06-07T12:00:00"
+    ticker: "MSFT"
+    quantity: 100
+    price: 250.0
+    fees: 21.0
