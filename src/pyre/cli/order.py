@@ -1,20 +1,36 @@
 from typing import Optional
-from sqlalchemy import select
 
+from httpx import Client
+from typer import Typer
 import pandas as pd
 import pendulum
 import typer
 import yaml
-from sqlalchemy.orm import Session
-from typer import Typer
 
 from pyre.cli.helpers import render_table
-from pyre.db.engine import create_engine
+from pyre.config import config
+from pyre.api.v1.models import Order
 
 
 ORDERS_KEY = "orders"
 
 order = Typer(add_completion=False)
+
+
+def _get_client() -> Client:
+    return Client(base_url=f"{config.PYRE_ENDPOINT}/v1/orders")
+
+
+@order.command()
+def list() -> None:
+    """List all market orders passed"""
+    client = _get_client()
+    response = client.get("/")
+    orders = response.json()
+    table = pd.DataFrame.from_records(orders)
+    render_table(table)
+
+
 
 @order.command()
 def register(
@@ -26,104 +42,50 @@ def register(
     fees: float = typer.Option(0.0, "-f", "--fees", help="Broker fee"),
 ) -> None:
     """Register a passed market order."""
-    engine = create_engine()
-    with Session(engine) as session:
-        order = Order(
-            id=id,
-            datetime=pendulum.parse(datetime),
-            ticker=ticker,
-            quantity=quantity,
-            price=price,
-            fees=fees,
-        )
-        session.add(order)
-        session.commit()
+    client = _get_client()
 
+    _datetime = pendulum.parse(datetime)
+    order = Order(
+        id=id,
+        datetime=_datetime,
+        ticker=ticker,
+        quantity=quantity,
+        price=price,
+        fees=fees,
+    )
+    client.post("/", json=order.model_dump())
+    
 
 @order.command()
 def bulk(
     file: str
 ) -> None:
     """Insert stock market orders in bulk from yaml"""
+    client = _get_client()
+
     with open(file) as f:
         data = yaml.safe_load(f)
-        orders = [
-            Order(
-                id=int(record["id"]),
-                datetime=pendulum.parse(record["datetime"]),
-                ticker=str(record["ticker"]),
-                quantity=int(record["quantity"]),
-                price=float(record["price"]),
-                fees=float(record["fees"]),
-            )
-            for record in data[ORDERS_KEY]
-        ]
 
-    engine = create_engine()
-    with Session(engine) as session:
-        for order in orders:
-            session.query(Order).filter(
-                Order.id == order.id
-            ).delete()
-            session.add(order)
-        session.commit()
-
-
-@order.command()
-def list() -> None:
-    """List all market orders passed"""
-    engine = create_engine()
-    with Session(engine) as session:
-        stmt = select(Order)
-        results = session.execute(stmt)
-        fields = ["id", "datetime", "ticker", "quantity", "price", "fees"]
-        table = pd.DataFrame(
-            data=[
-                {
-                    field: str(getattr(r, field))
-                    for field in fields
-                } 
-                for r, in results
-            ],
-            columns=fields
-        )
-        render_table(table)
-
-
-@order.command()
-def dump(output: Optional[str] = typer.Option(None, "-o", "--output", help="Output location to dump yaml")) -> None:
-    """Dump all orders (for backup purposes)"""
-    engine = create_engine()
-    with Session(engine) as session:
-        stmt = select(Order)
-        results = session.execute(stmt)
-        orders = {
-            "orders": [
-                {
-                    "id": order.id,
-                    "datetime": pendulum.parse(f"{order.datetime}").to_iso8601_string(),
-                    "ticker": order.ticker,
-                    "quantity": order.quantity,
-                    "price": order.price,
-                    "fees": order.fees
-                }
-                for order, in results
-            ]
-        }
-        if output:
-            with open(output, "w") as f:
-                yaml.safe_dump(f)
-        else:
-            typer.echo(yaml.safe_dump(orders))
+    client.post("/bulk", json=data[ORDERS_KEY])
 
 
 @order.command()
 def delete(id: int) -> None:
     """Delete an order by its ID"""
-    engine = create_engine()
-    with Session(engine) as session:
-        session.query(Order).filter(
-            Order.id == id
-        ).delete()
-        session.commit()
+    client = _get_client()
+    client.delete(f"/{id}")
 
+
+@order.command()
+def dump(output: Optional[str] = typer.Option(None, "-o", "--output", help="Output location to dump yaml")) -> None:
+    """Dump all orders (for backup purposes)"""
+    client = _get_client()
+
+    response = client.get("/")
+    orders = response.json()
+    data = {ORDERS_KEY: orders}
+    if output:
+        with open(output, "w") as f:
+            yaml.safe_dump(data, f)
+    else:
+        typer.echo(yaml.safe_dump(data))

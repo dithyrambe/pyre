@@ -1,15 +1,30 @@
 services:
-  app:
+  api:
     image: dithyrambe/pyre
     build: ..
-    container_name: app
+    container_name: api
     environment:
       PYRE_DB_URL: "postgre:5432/pyre"
       PYRE_DB_USER: "pyre"
       PYRE_DB_PASSWORD: "pyre"
-      PYRE_ORDERS_FILE: "/config/orders.yaml"
-      PYRE_POLLING_INTERVAL: "600"
-    command: ["market", "refresh", "--setup", "--forever"]
+    ports:
+      - 8000:8000
+    command: ["uvicorn", "pyre.api.main:api", "--host", "0.0.0.0", "--port", "8000"]
+    depends_on:
+      postgre:
+        condition: service_healthy
+    restart: always
+
+  crawler:
+    image: dithyrambe/pyre
+    build: ..
+    container_name: crawler
+    environment:
+      PYRE_DB_URL: "postgre:5432/pyre"
+      PYRE_DB_USER: "pyre"
+      PYRE_DB_PASSWORD: "pyre"
+      PYRE_POLLING_INTERVAL: "30"
+    command: ["pyre", "market", "refresh", "--forever"]
     volumes:
       - ./config:/config
     depends_on:

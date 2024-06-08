@@ -97,6 +97,33 @@ def test_update_order(client: TestClient):
     assert orders[0] == order_data
 
 
+def test_bulk_upsert(client: TestClient):
+    orders_data = [
+        {
+            "id": 1,
+            "datetime": "2024-06-08T00:00:00",
+            "ticker": "DEF",
+            "price": 10.0,
+            "quantity": 2.0,
+            "fees": 0.1,
+        },
+        {
+            "id": 2,
+            "datetime": "2024-06-08T00:00:00",
+            "ticker": "ABC",
+            "price": 10.0,
+            "quantity": 2.0,
+            "fees": 0.1,
+        },
+    ]
+    _ = client.post(
+        "/v1/orders/bulk",
+        json=orders_data
+    )
+    orders_response = client.get("/v1/orders")
+    assert orders_response.json() == orders_data
+
+
 def test_delete_order(client: TestClient):
     _ = client.delete("/v1/orders/1")
     response = client.get("/v1/orders")

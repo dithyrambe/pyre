@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings
 
 
 class Config(BaseSettings):
+    PYRE_ENDPOINT: str = "http://localhost:8000"
     PYRE_ORDERS_FILE: str = os.path.expanduser("~/.pyre/orders.yaml")
     PYRE_POLLING_INTERVAL: int = 600
     PYRE_DB_URL: str = "localhost:5432/pyre"

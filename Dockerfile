@@ -11,5 +11,3 @@ FROM python:3.11-slim AS production
 
 COPY --from=builder dist dist
 RUN pip install --no-cache-dir dist/* && rm -rf dist
-
-ENTRYPOINT ["pyre"]

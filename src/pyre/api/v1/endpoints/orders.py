@@ -22,6 +22,12 @@ def get_order_by_id(id: int, db: Session = Depends(get_db)):
     return order
 
 
+@router.post("/bulk")
+def upsert_orders(orders: List[Order], db: Session = Depends(get_db)):
+    upserted = crud.bulk_upsert_order(orders=[o.model_dump() for o in orders], db=db)
+    return upserted
+
+
 @router.post("/", response_model=Order)
 def upsert_order(order: Order, db: Session = Depends(get_db)):
     upserted = crud.upsert_order(order=order.model_dump(), db=db)
