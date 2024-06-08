@@ -142,7 +142,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "fixedColor": "light-orange",
+            "fixedColor": "semi-dark-purple",
             "mode": "shades"
           },
           "mappings": [],
@@ -173,7 +173,7 @@
       "options": {
         "colorMode": "background",
         "graphMode": "none",
-        "justifyMode": "center",
+        "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
@@ -183,8 +183,8 @@
           "values": false
         },
         "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
+        "textMode": "value_and_name",
+        "wideLayout": false
       },
       "pluginVersion": "11.0.0",
       "targets": [
@@ -197,7 +197,7 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "WITH scope AS (\n  SELECT \n    sd.datetime,\n    sd.ticker,\n    (select close from stock_data tmp where tmp.datetime <= sd.datetime and tmp.ticker = sd.ticker and tmp.close is not null order by datetime desc limit 1) AS close,\n    i.price,\n    i.quantity\n  FROM stock_data sd\n  LEFT JOIN orders i\n    ON i.ticker = sd.ticker\n    AND i.datetime <= sd.datetime\n)\nSELECT\n  datetime AS time,\n  SUM(close * quantity) AS worth,\n  SUM(price * quantity) AS invested\nFROM scope\nGROUP BY datetime\nORDER BY datetime",
+          "rawSql": "WITH scope AS (\n  SELECT \n    sd.datetime,\n    sd.ticker,\n    (select close from stock_data tmp where tmp.datetime <= sd.datetime and tmp.ticker = sd.ticker and tmp.close is not null order by datetime desc limit 1) AS close,\n    i.price,\n    i.quantity\n  FROM stock_data sd\n  LEFT JOIN orders i\n    ON i.ticker = sd.ticker\n    AND i.datetime <= sd.datetime\n)\nSELECT\n  datetime AS time,\n  SUM(close * quantity) AS \"Worth\",\n  SUM(price * quantity) AS \"Invested\"\nFROM scope\nGROUP BY datetime\nORDER BY datetime",
           "refId": "A",
           "sql": {
             "columns": [
@@ -218,7 +218,6 @@
           }
         }
       ],
-      "title": "Valuation",
       "type": "stat"
     },
     {
@@ -392,7 +391,7 @@
           }
         }
       ],
-      "title": "Gains / Loss",
+      "title": "Performance",
       "type": "stat"
     },
     {
