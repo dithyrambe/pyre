@@ -97,7 +97,7 @@
         },
         "tooltip": {
           "maxHeight": 600,
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         }
       },
@@ -171,7 +171,7 @@
       },
       "id": 35,
       "options": {
-        "colorMode": "background_solid",
+        "colorMode": "background",
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
@@ -252,13 +252,13 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 9,
+        "w": 6,
         "x": 15,
         "y": 4
       },
       "id": 36,
       "options": {
-        "colorMode": "background_solid",
+        "colorMode": "background",
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
@@ -285,6 +285,93 @@
           "hide": false,
           "rawQuery": true,
           "rawSql": "WITH scope AS (\n  SELECT \n    sd.datetime,\n    sd.ticker,\n    (select close from stock_data tmp where tmp.datetime <= sd.datetime and tmp.ticker = sd.ticker and tmp.close is not null order by datetime desc limit 1) AS close,\n    i.price,\n    i.quantity\n  FROM stock_data sd\n  LEFT JOIN orders i\n    ON i.ticker = sd.ticker\n    AND i.datetime <= sd.datetime\n)\nSELECT\n  datetime AS time,\n  SUM(close * quantity) - SUM(price * quantity) AS gains\nFROM scope\nGROUP BY datetime\nORDER BY datetime",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Gains / Loss",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "pyre"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "light-orange",
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 21,
+        "y": 4
+      },
+      "id": 43,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "pyre"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "WITH scope AS (\n  SELECT \n    sd.datetime,\n    sd.ticker,\n    (select close from stock_data tmp where tmp.datetime <= sd.datetime and tmp.ticker = sd.ticker and tmp.close is not null order by datetime desc limit 1) AS close,\n    i.price,\n    i.quantity\n  FROM stock_data sd\n  LEFT JOIN orders i\n    ON i.ticker = sd.ticker\n    AND i.datetime <= sd.datetime\n)\nSELECT\n  datetime AS time,\n  SUM(close * quantity) / SUM(price * quantity) - 1 AS performance\nFROM scope\nGROUP BY datetime\nORDER BY datetime",
           "refId": "A",
           "sql": {
             "columns": [
@@ -779,7 +866,7 @@
       "type": "stat"
     }
   ],
-  "refresh": "5s",
+  "refresh": "30s",
   "schemaVersion": 39,
   "tags": [],
   "templating": {
@@ -815,14 +902,14 @@
     ]
   },
   "time": {
-    "from": "now/M",
-    "to": "now/M"
+    "from": "now-5y",
+    "to": "now"
   },
   "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {},
   "timezone": "browser",
   "title": "PYRE",
   "uid": "pyre-dashboard",
-  "version": 4,
+  "version": 2,
   "weekStart": ""
 }
