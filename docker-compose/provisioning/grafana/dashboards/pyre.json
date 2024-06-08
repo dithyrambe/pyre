@@ -110,7 +110,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "WITH scope AS (\n  SELECT \n    sd.datetime,\n    sd.ticker,\n    (select close from stock_data tmp where tmp.datetime <= sd.datetime and tmp.ticker = sd.ticker and tmp.close is not null order by datetime desc limit 1) AS close,\n    i.price,\n    i.quantity\n  FROM stock_data sd\n  LEFT JOIN investments i\n    ON i.ticker = sd.ticker\n    AND i.datetime <= sd.datetime\n)\nSELECT\n  datetime AS time,\n  SUM(close * quantity) AS worth,\n  SUM(price * quantity) AS invested\nFROM scope\nGROUP BY 1\nORDER BY 1",
+          "rawSql": "WITH scope AS (\n  SELECT \n    sd.datetime,\n    sd.ticker,\n    (select close from stock_data tmp where tmp.datetime <= sd.datetime and tmp.ticker = sd.ticker and tmp.close is not null order by datetime desc limit 1) AS close,\n    i.price,\n    i.quantity\n  FROM stock_data sd\n  LEFT JOIN orders i\n    ON i.ticker = sd.ticker\n    AND i.datetime <= sd.datetime\n)\nSELECT\n  datetime AS time,\n  SUM(close * quantity) AS worth,\n  SUM(price * quantity) AS invested\nFROM scope\nGROUP BY 1\nORDER BY 1",
           "refId": "A",
           "sql": {
             "columns": [
@@ -197,7 +197,7 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "WITH scope AS (\n  SELECT \n    sd.datetime,\n    sd.ticker,\n    (select close from stock_data tmp where tmp.datetime <= sd.datetime and tmp.ticker = sd.ticker and tmp.close is not null order by datetime desc limit 1) AS close,\n    i.price,\n    i.quantity\n  FROM stock_data sd\n  LEFT JOIN investments i\n    ON i.ticker = sd.ticker\n    AND i.datetime <= sd.datetime\n)\nSELECT\n  datetime AS time,\n  SUM(close * quantity) AS worth,\n  SUM(price * quantity) AS invested\nFROM scope\nGROUP BY datetime\nORDER BY datetime",
+          "rawSql": "WITH scope AS (\n  SELECT \n    sd.datetime,\n    sd.ticker,\n    (select close from stock_data tmp where tmp.datetime <= sd.datetime and tmp.ticker = sd.ticker and tmp.close is not null order by datetime desc limit 1) AS close,\n    i.price,\n    i.quantity\n  FROM stock_data sd\n  LEFT JOIN orders i\n    ON i.ticker = sd.ticker\n    AND i.datetime <= sd.datetime\n)\nSELECT\n  datetime AS time,\n  SUM(close * quantity) AS worth,\n  SUM(price * quantity) AS invested\nFROM scope\nGROUP BY datetime\nORDER BY datetime",
           "refId": "A",
           "sql": {
             "columns": [
@@ -284,7 +284,7 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "WITH scope AS (\n  SELECT \n    sd.datetime,\n    sd.ticker,\n    (select close from stock_data tmp where tmp.datetime <= sd.datetime and tmp.ticker = sd.ticker and tmp.close is not null order by datetime desc limit 1) AS close,\n    i.price,\n    i.quantity\n  FROM stock_data sd\n  LEFT JOIN investments i\n    ON i.ticker = sd.ticker\n    AND i.datetime <= sd.datetime\n)\nSELECT\n  datetime AS time,\n  SUM(close * quantity) - SUM(price * quantity) AS gains\nFROM scope\nGROUP BY datetime\nORDER BY datetime",
+          "rawSql": "WITH scope AS (\n  SELECT \n    sd.datetime,\n    sd.ticker,\n    (select close from stock_data tmp where tmp.datetime <= sd.datetime and tmp.ticker = sd.ticker and tmp.close is not null order by datetime desc limit 1) AS close,\n    i.price,\n    i.quantity\n  FROM stock_data sd\n  LEFT JOIN orders i\n    ON i.ticker = sd.ticker\n    AND i.datetime <= sd.datetime\n)\nSELECT\n  datetime AS time,\n  SUM(close * quantity) - SUM(price * quantity) AS gains\nFROM scope\nGROUP BY datetime\nORDER BY datetime",
           "refId": "A",
           "sql": {
             "columns": [
@@ -494,7 +494,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "WITH\ncombined AS (\n    SELECT\n        sd.ticker,\n        sd.datetime,\n        sd.close,\n        i.quantity\n    FROM\n        stock_data sd\n    LEFT JOIN investments i\n        ON sd.ticker = i.ticker AND sd.datetime >= i.datetime\n)\nSELECT\n    ticker,\n    datetime AS time,\n    close * SUM(quantity) AS value\nFROM\n    combined\nWHERE $__timeFilter(datetime)\n  AND ticker = $ticker\nGROUP BY \n    ticker,\n    datetime,\n    close\nORDER BY\n    datetime;",
+          "rawSql": "WITH\ncombined AS (\n    SELECT\n        sd.ticker,\n        sd.datetime,\n        sd.close,\n        i.quantity\n    FROM\n        stock_data sd\n    LEFT JOIN orders i\n        ON sd.ticker = i.ticker AND sd.datetime >= i.datetime\n)\nSELECT\n    ticker,\n    datetime AS time,\n    close * SUM(quantity) AS value\nFROM\n    combined\nWHERE $__timeFilter(datetime)\n  AND ticker = $ticker\nGROUP BY \n    ticker,\n    datetime,\n    close\nORDER BY\n    datetime;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -582,7 +582,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "WITH\ncombined AS (\n    SELECT\n        sd.ticker,\n        sd.datetime,\n        sd.close,\n        i.price,\n        i.quantity,\n        i.fees\n    FROM\n        stock_data sd\n    LEFT JOIN investments i\n        ON sd.ticker = i.ticker AND sd.datetime >= i.datetime\n)\nSELECT\n    ticker,\n    datetime AS time,\n    close * SUM(quantity) - SUM(price * quantity + fees)\nFROM\n    combined\nWHERE $__timeFilter(datetime)\n  AND ticker = $ticker\nGROUP BY \n    ticker,\n    datetime,\n    close\nORDER BY\n    datetime;",
+          "rawSql": "WITH\ncombined AS (\n    SELECT\n        sd.ticker,\n        sd.datetime,\n        sd.close,\n        i.price,\n        i.quantity,\n        i.fees\n    FROM\n        stock_data sd\n    LEFT JOIN orders i\n        ON sd.ticker = i.ticker AND sd.datetime >= i.datetime\n)\nSELECT\n    ticker,\n    datetime AS time,\n    close * SUM(quantity) - SUM(price * quantity + fees)\nFROM\n    combined\nWHERE $__timeFilter(datetime)\n  AND ticker = $ticker\nGROUP BY \n    ticker,\n    datetime,\n    close\nORDER BY\n    datetime;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -754,7 +754,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT SUM(price * quantity + fees) / sum(quantity)\nFROM investments\nWHERE ticker = $ticker",
+          "rawSql": "SELECT SUM(price * quantity + fees) / sum(quantity)\nFROM orders\nWHERE ticker = $ticker",
           "refId": "A",
           "sql": {
             "columns": [
@@ -798,14 +798,14 @@
           "type": "grafana-postgresql-datasource",
           "uid": "pyre"
         },
-        "definition": "SELECT ticker \nFROM (SELECT ticker, count(*) from investments GROUP BY ticker ORDER BY 2 DESC)",
+        "definition": "SELECT ticker \nFROM (SELECT ticker, count(*) FROM orders GROUP BY ticker ORDER BY 2 DESC)",
         "hide": 0,
         "includeAll": true,
         "label": "ticker",
         "multi": true,
         "name": "ticker",
         "options": [],
-        "query": "SELECT ticker \nFROM (SELECT ticker, count(*) from investments GROUP BY ticker ORDER BY 2 DESC)",
+        "query": "SELECT ticker \nFROM (SELECT ticker, count(*) FROM orders GROUP BY ticker ORDER BY 2 DESC)",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,

@@ -15,7 +15,7 @@ from typer import Typer
 
 from pyre.config import config
 from pyre.db.engine import create_engine
-from pyre.db.schemas import Investment, StockData
+from pyre.db.schemas import Order, StockData
 from pyre.exceptions import PyreException
 
 
@@ -137,7 +137,7 @@ def register(
     """Register a passed market order."""
     engine = create_engine()
     with Session(engine) as session:
-        investment = Investment(
+        order = Order(
             id=id,
             datetime=pendulum.parse(datetime),
             ticker=ticker,
@@ -145,7 +145,7 @@ def register(
             price=price,
             fees=fees,
         )
-        session.add(investment)
+        session.add(order)
         session.commit()
 
 
@@ -156,8 +156,8 @@ def bulk(
     """Insert stock market orders in bulk from yaml"""
     with open(file) as f:
         data = yaml.safe_load(f)
-        investments = [
-            Investment(
+        orders = [
+            Order(
                 id=int(record["id"]),
                 datetime=pendulum.parse(record["datetime"]),
                 ticker=str(record["ticker"]),
@@ -170,11 +170,11 @@ def bulk(
 
     engine = create_engine()
     with Session(engine) as session:
-        for investment in investments:
-            session.query(Investment).filter(
-                Investment.id == investment.id
+        for order in orders:
+            session.query(Order).filter(
+                Order.id == order.id
             ).delete()
-            session.add(investment)
+            session.add(order)
         session.commit()
 
 
@@ -183,7 +183,7 @@ def list() -> None:
     """List all market orders passed"""
     engine = create_engine()
     with Session(engine) as session:
-        stmt = select(Investment)
+        stmt = select(Order)
         results = session.execute(stmt)
         fields = ["id", "datetime", "ticker", "quantity", "price", "fees"]
         table = pd.DataFrame(
@@ -204,7 +204,7 @@ def dump(output: Optional[str] = typer.Option(None, "-o", "--output", help="Outp
     """Dump all orders (for backup purposes)"""
     engine = create_engine()
     with Session(engine) as session:
-        stmt = select(Investment)
+        stmt = select(Order)
         results = session.execute(stmt)
         orders = {
             "orders": [
@@ -231,8 +231,8 @@ def delete(id: int) -> None:
     """Delete an order by its ID"""
     engine = create_engine()
     with Session(engine) as session:
-        session.query(Investment).filter(
-            Investment.id == id
+        session.query(Order).filter(
+            Order.id == id
         ).delete()
         session.commit()
 
@@ -244,9 +244,9 @@ def refresh(setup: bool = False, forever: bool = False):
         
     engine = create_engine()
     with Session(engine) as session:
-        stmt = select(Investment)
+        stmt = select(Order)
         results = session.execute(stmt)
-        tickers, dts = zip(*[(investment.ticker, investment.datetime) for investment, in results])
+        tickers, dts = zip(*[(order.ticker, order.datetime) for order, in results])
 
     engine = create_engine()
     min_datetime = min(dts).date()
