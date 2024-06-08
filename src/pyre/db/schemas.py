@@ -17,8 +17,8 @@ class StockData(Base):
     volume = Column(Integer, nullable=True)
 
 
-class Investment(Base):
-    __tablename__ = 'investments'
+class Order(Base):
+    __tablename__ = 'orders'
     
     id = Column(Integer, primary_key=True, index=True)
     datetime = Column(DateTime, index=True)
