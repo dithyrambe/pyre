@@ -20,10 +20,11 @@
   "graphTooltip": 0,
   "id": 1,
   "links": [],
+  "liveNow": false,
   "panels": [
     {
       "datasource": {
-        "type": "grafana-postgresql-datasource",
+        "type": "postgres",
         "uid": "pyre"
       },
       "fieldConfig": {
@@ -110,7 +111,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "WITH scope AS (\n  SELECT \n    sd.datetime,\n    sd.ticker,\n    (select close from stock_data tmp where tmp.datetime <= sd.datetime and tmp.ticker = sd.ticker and tmp.close is not null order by datetime desc limit 1) AS close,\n    i.price,\n    i.quantity\n  FROM stock_data sd\n  LEFT JOIN orders i\n    ON i.ticker = sd.ticker\n    AND i.datetime <= sd.datetime\n)\nSELECT\n  datetime AS time,\n  SUM(close * quantity) AS worth,\n  SUM(price * quantity) AS invested\nFROM scope\nGROUP BY 1\nORDER BY 1",
+          "rawSql": "WITH scope AS (\n  SELECT \n    sd.datetime,\n    sd.ticker,\n    (select close from stock_data tmp where tmp.datetime <= sd.datetime and tmp.ticker = sd.ticker and tmp.close is not null order by datetime desc limit 1) AS close,\n    i.price,\n    i.quantity\n  FROM stock_data sd\n  LEFT JOIN orders i\n    ON i.ticker = sd.ticker\n    AND i.datetime <= sd.datetime\n)\nSELECT\n  datetime AS time,\n  SUM(close * quantity) AS \"Worth\",\n  SUM(price * quantity) AS \"Invested\"\nFROM scope\nGROUP BY 1\nORDER BY 1",
           "refId": "A",
           "sql": {
             "columns": [
@@ -136,8 +137,8 @@
     },
     {
       "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "pyre"
+        "type": "datasource",
+        "uid": "-- Dashboard --"
       },
       "fieldConfig": {
         "defaults": {
@@ -186,44 +187,24 @@
         "textMode": "value_and_name",
         "wideLayout": false
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "10.2.2",
       "targets": [
         {
           "datasource": {
-            "type": "grafana-postgresql-datasource",
-            "uid": "pyre"
+            "type": "datasource",
+            "uid": "-- Dashboard --"
           },
-          "editorMode": "code",
-          "format": "table",
-          "hide": false,
-          "rawQuery": true,
-          "rawSql": "WITH scope AS (\n  SELECT \n    sd.datetime,\n    sd.ticker,\n    (select close from stock_data tmp where tmp.datetime <= sd.datetime and tmp.ticker = sd.ticker and tmp.close is not null order by datetime desc limit 1) AS close,\n    i.price,\n    i.quantity\n  FROM stock_data sd\n  LEFT JOIN orders i\n    ON i.ticker = sd.ticker\n    AND i.datetime <= sd.datetime\n)\nSELECT\n  datetime AS time,\n  SUM(close * quantity) AS \"Worth\",\n  SUM(price * quantity) AS \"Invested\"\nFROM scope\nGROUP BY datetime\nORDER BY datetime",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          }
+          "panelId": 34,
+          "refId": "A"
         }
       ],
+      "transformations": [],
       "type": "stat"
     },
     {
       "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "pyre"
+        "type": "datasource",
+        "uid": "-- Dashboard --"
       },
       "fieldConfig": {
         "defaults": {
@@ -272,45 +253,41 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "10.2.2",
       "targets": [
         {
           "datasource": {
-            "type": "grafana-postgresql-datasource",
-            "uid": "pyre"
+            "type": "datasource",
+            "uid": "-- Dashboard --"
           },
-          "editorMode": "code",
-          "format": "table",
-          "hide": false,
-          "rawQuery": true,
-          "rawSql": "WITH scope AS (\n  SELECT \n    sd.datetime,\n    sd.ticker,\n    (select close from stock_data tmp where tmp.datetime <= sd.datetime and tmp.ticker = sd.ticker and tmp.close is not null order by datetime desc limit 1) AS close,\n    i.price,\n    i.quantity\n  FROM stock_data sd\n  LEFT JOIN orders i\n    ON i.ticker = sd.ticker\n    AND i.datetime <= sd.datetime\n)\nSELECT\n  datetime AS time,\n  SUM(close * quantity) - SUM(price * quantity) AS gains\nFROM scope\nGROUP BY datetime\nORDER BY datetime",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          }
+          "panelId": 34,
+          "refId": "A"
         }
       ],
       "title": "Gains / Loss",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": "Worth",
+              "operator": "-",
+              "right": "Invested"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            },
+            "replaceFields": true
+          }
+        }
+      ],
       "type": "stat"
     },
     {
       "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "pyre"
+        "type": "datasource",
+        "uid": "-- Dashboard --"
       },
       "fieldConfig": {
         "defaults": {
@@ -359,39 +336,49 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "10.2.2",
       "targets": [
         {
           "datasource": {
-            "type": "grafana-postgresql-datasource",
-            "uid": "pyre"
+            "type": "datasource",
+            "uid": "-- Dashboard --"
           },
-          "editorMode": "code",
-          "format": "table",
-          "hide": false,
-          "rawQuery": true,
-          "rawSql": "WITH scope AS (\n  SELECT \n    sd.datetime,\n    sd.ticker,\n    (select close from stock_data tmp where tmp.datetime <= sd.datetime and tmp.ticker = sd.ticker and tmp.close is not null order by datetime desc limit 1) AS close,\n    i.price,\n    i.quantity\n  FROM stock_data sd\n  LEFT JOIN orders i\n    ON i.ticker = sd.ticker\n    AND i.datetime <= sd.datetime\n)\nSELECT\n  datetime AS time,\n  SUM(close * quantity) / SUM(price * quantity) - 1 AS performance\nFROM scope\nGROUP BY datetime\nORDER BY datetime",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          }
+          "panelId": 34,
+          "refId": "A"
         }
       ],
       "title": "Performance",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": "Worth",
+              "operator": "-",
+              "right": "Invested"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": "Worth - Invested",
+              "operator": "/",
+              "right": "Invested"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            },
+            "replaceFields": true
+          }
+        }
+      ],
       "type": "stat"
     },
     {
@@ -570,7 +557,7 @@
         "textMode": "value",
         "wideLayout": true
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "10.2.2",
       "targets": [
         {
           "datasource": {
@@ -658,7 +645,7 @@
         "textMode": "value",
         "wideLayout": true
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "10.2.2",
       "targets": [
         {
           "datasource": {
@@ -746,7 +733,7 @@
         "textMode": "value",
         "wideLayout": true
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "10.2.2",
       "targets": [
         {
           "datasource": {
@@ -830,7 +817,7 @@
         "textMode": "value",
         "wideLayout": true
       },
-      "pluginVersion": "11.0.0",
+      "pluginVersion": "10.2.2",
       "targets": [
         {
           "datasource": {
@@ -865,8 +852,8 @@
       "type": "stat"
     }
   ],
-  "refresh": "30s",
-  "schemaVersion": 39,
+  "refresh": "5s",
+  "schemaVersion": 38,
   "tags": [],
   "templating": {
     "list": [
@@ -901,14 +888,13 @@
     ]
   },
   "time": {
-    "from": "now-5y",
-    "to": "now"
+    "from": "now/M",
+    "to": "now/M"
   },
-  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {},
   "timezone": "browser",
   "title": "PYRE",
   "uid": "pyre-dashboard",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }
