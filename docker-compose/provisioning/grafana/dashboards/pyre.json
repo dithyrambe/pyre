@@ -17,7 +17,7 @@
   },
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "graphTooltip": 0,
+  "graphTooltip": 2,
   "id": 1,
   "links": [],
   "liveNow": false,
@@ -472,7 +472,7 @@
         },
         "tooltip": {
           "maxHeight": 600,
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         }
       },
@@ -852,7 +852,6 @@
       "type": "stat"
     }
   ],
-  "refresh": "5m",
   "schemaVersion": 39,
   "tags": [],
   "templating": {
@@ -888,7 +887,7 @@
     ]
   },
   "time": {
-    "from": "now/M",
+    "from": "now-6M",
     "to": "now"
   },
   "timeRangeUpdatedDuringEditOrView": false,
@@ -896,6 +895,6 @@
   "timezone": "browser",
   "title": "PYRE",
   "uid": "pyre-dashboard",
-  "version": 10,
+  "version": 15,
   "weekStart": ""
 }
