@@ -24,7 +24,7 @@
   "panels": [
     {
       "datasource": {
-        "type": "postgres",
+        "type": "grafana-postgresql-datasource",
         "uid": "pyre"
       },
       "fieldConfig": {
@@ -111,7 +111,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "WITH scope AS (\n  SELECT \n    sd.datetime,\n    sd.ticker,\n    (select close from stock_data tmp where tmp.datetime <= sd.datetime and tmp.ticker = sd.ticker and tmp.close is not null order by datetime desc limit 1) AS close,\n    i.price,\n    i.quantity\n  FROM stock_data sd\n  LEFT JOIN orders i\n    ON i.ticker = sd.ticker\n    AND i.datetime <= sd.datetime\n)\nSELECT\n  datetime AS time,\n  SUM(close * quantity) AS \"Worth\",\n  SUM(price * quantity) AS \"Invested\"\nFROM scope\nGROUP BY 1\nORDER BY 1",
+          "rawSql": "WITH scope AS (\n  SELECT \n    sd.datetime,\n    sd.ticker,\n    (select close from stock_data tmp where tmp.datetime <= sd.datetime and tmp.ticker = sd.ticker and tmp.close is not null order by datetime desc limit 1) AS close,\n    i.price,\n    i.quantity,\n    i.fees\n  FROM stock_data sd\n  LEFT JOIN orders i\n    ON i.ticker = sd.ticker\n    AND i.datetime <= sd.datetime\n)\nSELECT\n  datetime AS time,\n  SUM(close * quantity) AS \"Worth\",\n  SUM(price * quantity + fees) AS \"Invested\"\nFROM scope\nWHERE datetime <= $__timeTo()\n  AND ticker in ($ticker)\nGROUP BY 1\nORDER BY 1",
           "refId": "A",
           "sql": {
             "columns": [
@@ -187,7 +187,7 @@
         "textMode": "value_and_name",
         "wideLayout": false
       },
-      "pluginVersion": "10.2.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -198,7 +198,6 @@
           "refId": "A"
         }
       ],
-      "transformations": [],
       "type": "stat"
     },
     {
@@ -253,7 +252,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -336,7 +335,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -557,7 +556,7 @@
         "textMode": "value",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -645,7 +644,7 @@
         "textMode": "value",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -733,7 +732,7 @@
         "textMode": "value",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -817,7 +816,7 @@
         "textMode": "value",
         "wideLayout": true
       },
-      "pluginVersion": "10.2.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -852,8 +851,8 @@
       "type": "stat"
     }
   ],
-  "refresh": "5s",
-  "schemaVersion": 38,
+  "refresh": "5m",
+  "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": [
@@ -889,12 +888,13 @@
   },
   "time": {
     "from": "now/M",
-    "to": "now/M"
+    "to": "now"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {},
   "timezone": "browser",
   "title": "PYRE",
   "uid": "pyre-dashboard",
-  "version": 3,
+  "version": 9,
   "weekStart": ""
 }
