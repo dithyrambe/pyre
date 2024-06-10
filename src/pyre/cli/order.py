@@ -3,13 +3,11 @@ from typing import Optional
 from httpx import Client
 from typer import Typer
 import pandas as pd
-import pendulum
 import typer
 import yaml
 
 from pyre.cli.helpers import render_table
 from pyre.config import config
-from pyre.api.v1.models import Order
 
 
 ORDERS_KEY = "orders"
@@ -44,16 +42,15 @@ def register(
     """Register a passed market order."""
     client = _get_client()
 
-    _datetime = pendulum.parse(datetime)
-    order = Order(
-        id=id,
-        datetime=_datetime,
-        ticker=ticker,
-        quantity=quantity,
-        price=price,
-        fees=fees,
-    )
-    client.post("/", json=order.model_dump())
+    order = {
+        "id": id,
+        "datetime": datetime,
+        "ticker": ticker,
+        "quantity": quantity,
+        "price": price,
+        "fees": fees,
+    }
+    client.post("/", json=order)
     
 
 @order.command()
