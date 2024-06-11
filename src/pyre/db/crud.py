@@ -1,18 +1,32 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
+import pendulum
 from sqlalchemy.orm import Session
 
 from pyre.db.schemas import Order
 
 
-def get_orders(db: Session):
-    return db.query(Order).all()
+def get_orders(db: Session, ticker: Optional[str] = None, start_datetime: Optional[str] = None, end_datetime: Optional[str] = None):
+    query = db.query(Order)
+    if ticker:
+        query = query.filter(
+            Order.ticker == ticker
+        )
+    if start_datetime:
+        query = query.filter(
+            Order.datetime >= pendulum.parse(start_datetime)
+        )
+    if end_datetime:
+        query = query.filter(
+            Order.datetime < pendulum.parse(end_datetime)
+        )
+    return query.all()
     
 
-def get_order_by_id(id: int, db: Session):
+def get_order_by_id(db: Session, id: int):
     return db.query(Order).filter(Order.id == id).first()
 
 
-def upsert_order(order: Dict, db: Session):
+def upsert_order(db: Session, order: Dict):
     order = Order(**order)
     delete_order_by_id(id=order.id, db=db)
     db.add(order)
@@ -21,7 +35,7 @@ def upsert_order(order: Dict, db: Session):
     return order
 
 
-def bulk_upsert_order(orders: List[Dict], db: Session):
+def bulk_upsert_order(db: Session, orders: List[Dict]):
     orders = [Order(**data) for data in orders]
     for order in orders:
         db.query(Order).filter(
@@ -31,7 +45,7 @@ def bulk_upsert_order(orders: List[Dict], db: Session):
     db.commit()
 
 
-def delete_order_by_id(id: int, db: Session):
+def delete_order_by_id(db: Session, id: int):
     db.query(Order).filter(
         Order.id == id
     ).delete()

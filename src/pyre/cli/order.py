@@ -20,10 +20,21 @@ def _get_client() -> Client:
 
 
 @order.command()
-def list() -> None:
+def list(
+    ticker: Optional[str] = typer.Option(None, "-t", "--ticker", help="Filter orders on a specific ticker"),
+    start_datetime: Optional[str] = typer.Option(None, help="Start date filter (inclusive)"),
+    end_datetime: Optional[str] = typer.Option(None, help="End date filter (exclusive)"),
+) -> None:
     """List all market orders passed"""
     client = _get_client()
-    response = client.get("/")
+    response = client.get(
+        "/", 
+        params={
+            "ticker": ticker,
+            "start_datetime": start_datetime,
+            "end_datetime": end_datetime,
+        }
+    )
     orders = response.json()
     table = pd.DataFrame.from_records(orders)
     render_table(table)
