@@ -77,7 +77,7 @@ Simulation
 ```bash
 # Simulate DCA investment strategy over 100 simulations
 poetry run pyre simulate dca \
-    --symbol URTH \ 
+    --symbol '^990100-USD-STRD' \ 
     --amount 3000 \
     --seed 50000 \
     --start-date 2024-06-01 \
