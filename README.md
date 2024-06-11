@@ -77,10 +77,10 @@ Simulation
 ```bash
 # Simulate DCA investment strategy over 100 simulations
 poetry run pyre simulate dca \
-    --symbol '^990100-USD-STRD' \ 
+    --symbol '^990100-USD-STRD' \
     --amount 3000 \
     --seed 50000 \
     --start-date 2024-06-01 \
     --duration 17 \
-    -n 100  
+    -n 100
 ```
