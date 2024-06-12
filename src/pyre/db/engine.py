@@ -1,5 +1,3 @@
-from typing import Optional
-
 from sqlalchemy import Engine, create_engine as _create_engine
 from sqlalchemy.orm import Session
 

@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 
 from httpx import Client
@@ -16,7 +17,10 @@ order = Typer(add_completion=False)
 
 
 def _get_client() -> Client:
-    return Client(base_url=f"{config.PYRE_ENDPOINT}/v1/orders")
+    return Client(
+        base_url=f"{config.PYRE_ENDPOINT}/v1/orders",
+        headers={"X-API-Key": config.PYRE_API_KEY.get_secret_value()}
+    )
 
 
 @order.command()
