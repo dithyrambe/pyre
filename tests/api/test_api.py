@@ -43,7 +43,10 @@ def reset_data():
 
 @pytest.fixture()
 def client():
-    from pyre.api.main import api
+    from pyre.api.main import create_api
+    from pyre.config import Config
+
+    api = create_api(Config(PYRE_AUTH_DISABLED=True))
     return TestClient(api)
 
 

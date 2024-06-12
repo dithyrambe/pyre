@@ -4,6 +4,8 @@ services:
     build: ..
     container_name: api
     environment:
+      PYRE_AUTH_DISABLED: "true"  # remove this env var to enable auth
+      PYRE_API_KEY: "thisisalongenoughkey"
       PYRE_DB_URL: "postgre:5432/pyre"
       PYRE_DB_USER: "pyre"
       PYRE_DB_PASSWORD: "pyre"
@@ -40,6 +42,7 @@ services:
     build: ..
     container_name: init
     environment:
+      PYRE_API_KEY: "thisisalongenoughkey"
       PYRE_ENDPOINT: "http://api:8000"
     command: ["pyre", "order", "bulk", "/config/orders.yaml"]
     volumes:

@@ -8,8 +8,10 @@ class Config(BaseSettings):
     PYRE_ENDPOINT: str = "http://localhost:8000"
     PYRE_POLLING_INTERVAL: int = 600
     PYRE_DB_URL: str = "localhost:5432/pyre"
+    PYRE_API_KEY: SecretStr = SecretStr("")
     PYRE_DB_USER: SecretStr = SecretStr("")
     PYRE_DB_PASSWORD: SecretStr = SecretStr("")
+    PYRE_AUTH_DISABLED: bool = False
 
 
 config = Config()

@@ -1,11 +1,13 @@
 from typing import List, Optional
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 
+from pyre.api.v1.models import Order
 from pyre.db import crud
 from pyre.db.engine import get_db
-from pyre.api.v1.models import Order
+
 
 router = APIRouter(prefix="/orders")
 
