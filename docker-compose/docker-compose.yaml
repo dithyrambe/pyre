@@ -49,7 +49,7 @@ services:
         condition: service_healthy
 
   postgre:
-    image: postgres:latest
+    image: postgres:16
     container_name: postgre
     hostname: postgre
     environment:
@@ -67,7 +67,7 @@ services:
       retries: 10
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:11.0.0
     container_name: "grafana"
     environment:
       PYRE_DB_URL: "postgre:5432"
