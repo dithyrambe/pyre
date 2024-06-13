@@ -86,17 +86,12 @@ def _download(
 
 
 def _dump_records(db: Session, records: pd.DataFrame):
-    min_max_dates = records.groupby("ticker").apply(
-        lambda df: df.loc[df["close"].notnull(), "datetime"].agg(("min", "max"))
-    )
-
-    for ticker in records["ticker"].unique():
-        db.query(StockData).filter(
-            StockData.ticker == ticker,
-            StockData.datetime >= min_max_dates.loc[ticker, "min"],
-            StockData.datetime <= min_max_dates.loc[ticker, "max"],
-        ).delete()
-        db.commit()
+    min_max_dates = records["datetime"].agg(("min", "max"))
+    db.query(StockData).filter(
+        StockData.datetime >= min_max_dates["min"],
+        StockData.datetime <= min_max_dates["max"],
+    ).delete()
+    db.commit()
 
     records = records.fillna(NULL)
     db.bulk_save_objects([StockData(**record) for record in records.to_dict(orient="records")])
