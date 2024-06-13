@@ -15,6 +15,8 @@ from pyre.db.schemas import Order, StockData
 from pyre.exceptions import PyreException
 
 
+NULL = psycopg2.extensions.AsIs('NULL')
+
 class TimePeriod(str, Enum):
     ONE_DAY = "1d"
     FIVE_DAYS = "5d"
@@ -78,21 +80,27 @@ def _download(
         .stack("Ticker", future_stack=True)
         .reset_index()
         .rename(columns=COLUMN_MAPPING)
-        .fillna(psycopg2.extensions.AsIs('NULL'))
         [[*set(COLUMN_MAPPING.values())]]
     )
-    return df.to_dict(orient="records")
+    return df
 
 
-def _dump_records(session, records):
-    for record in records:
-        stock_data = StockData(**record)
-        session.query(StockData).filter(
-            StockData.ticker == stock_data.ticker,
-            StockData.datetime == stock_data.datetime
+def _dump_records(db: Session, records: pd.DataFrame):
+    min_max_dates = records.groupby("ticker").apply(
+        lambda df: df.loc[df["close"].notnull(), "datetime"].agg(("min", "max"))
+    )
+
+    for ticker in records["ticker"].unique():
+        db.query(StockData).filter(
+            StockData.ticker == ticker,
+            StockData.datetime >= min_max_dates.loc[ticker, "min"],
+            StockData.datetime <= min_max_dates.loc[ticker, "max"],
         ).delete()
-        session.add(stock_data)
-    session.commit()
+        db.commit()
+
+    records = records.fillna(NULL)
+    db.bulk_save_objects([StockData(**record) for record in records.to_dict(orient="records")])
+    db.commit()
 
 
 @market.command()
@@ -141,4 +149,3 @@ def refresh(
         if not forever:
             break
         time.sleep(polling_interval or config.PYRE_POLLING_INTERVAL)
-
