@@ -24,7 +24,7 @@
   "panels": [
     {
       "datasource": {
-        "type": "postgres",
+        "type": "grafana-postgresql-datasource",
         "uid": "pyre"
       },
       "fieldConfig": {
@@ -48,7 +48,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "smooth",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -80,11 +80,24 @@
           },
           "unit": "currencyEUR"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Gain"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
-        "w": 15,
+        "w": 11,
         "x": 0,
         "y": 0
       },
@@ -94,7 +107,7 @@
           "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
-          "showLegend": false
+          "showLegend": true
         },
         "tooltip": {
           "maxHeight": 600,
@@ -133,6 +146,24 @@
         }
       ],
       "title": "Portfolio worth",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Gain",
+            "binary": {
+              "left": "Worth",
+              "operator": "-",
+              "right": "Invested"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        }
+      ],
       "type": "timeseries"
     },
     {
@@ -143,9 +174,10 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "fixedColor": "semi-dark-blue",
-            "mode": "shades"
+            "fixedColor": "text",
+            "mode": "fixed"
           },
+          "fieldMinMax": false,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -166,21 +198,87 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 5,
-        "x": 15,
+        "w": 4,
+        "x": 11,
         "y": 0
       },
       "id": 35,
       "options": {
-        "colorMode": "background",
+        "colorMode": "value",
         "graphMode": "none",
-        "justifyMode": "auto",
+        "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
           ],
-          "fields": "",
+          "fields": "/^Worth$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": false
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 34,
+          "refId": "A"
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyEUR"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 3,
+        "x": 15,
+        "y": 0
+      },
+      "id": 103,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^Invested$/",
           "values": false
         },
         "showPercentChange": false,
@@ -242,7 +340,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 203
+                "value": 169
               }
             ]
           },
@@ -254,7 +352,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 148
+                "value": 131
               }
             ]
           },
@@ -274,8 +372,8 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 4,
-        "x": 20,
+        "w": 6,
+        "x": 18,
         "y": 0
       },
       "id": 71,
@@ -335,6 +433,89 @@
       "fieldConfig": {
         "defaults": {
           "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyEUR"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 3,
+        "x": 15,
+        "y": 3
+      },
+      "id": 120,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^3\\.5% withdraw$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": false
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 34,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "3.5% withdraw",
+            "binary": {
+              "left": "Worth",
+              "operator": "*",
+              "right": "0.035"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            }
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
             "fixedColor": "light-orange",
             "mode": "thresholds"
           },
@@ -358,8 +539,8 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 3,
-        "x": 15,
+        "w": 4,
+        "x": 11,
         "y": 5
       },
       "id": 36,
@@ -441,8 +622,8 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 2,
-        "x": 18,
+        "w": 3,
+        "x": 15,
         "y": 5
       },
       "id": 43,
@@ -548,7 +729,7 @@
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "smooth",
+            "lineInterpolation": "stepAfter",
             "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
@@ -692,7 +873,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "fixedColor": "blue",
+            "fixedColor": "text",
             "mode": "fixed"
           },
           "fieldMinMax": true,
@@ -919,7 +1100,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT close\nFROM stock_data\nWHERE $__timeFilter(datetime) AND ticker = $ticker",
+          "rawSql": "SELECT close\nFROM stock_data\nWHERE $__timeFilter(datetime) AND ticker = $ticker\nORDER BY datetime",
           "refId": "A",
           "sql": {
             "columns": [
@@ -940,7 +1121,7 @@
           }
         }
       ],
-      "title": "Last session close price",
+      "title": "Close",
       "type": "stat"
     },
     {
@@ -1024,7 +1205,7 @@
           }
         }
       ],
-      "title": "PRU",
+      "title": "AC",
       "type": "stat"
     },
     {
@@ -1174,7 +1355,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT close / (SELECT SUM(quantity * price + fees) / SUM(quantity) FROM orders WHERE ticker = $ticker) - 1 AS performance\nFROM stock_data\nWHERE $__timeFilter(datetime) AND ticker = $ticker",
+          "rawSql": "SELECT close / (SELECT SUM(quantity * price + fees) / SUM(quantity) FROM orders WHERE ticker = $ticker) - 1 AS performance\nFROM stock_data\nWHERE $__timeFilter(datetime) AND ticker = $ticker\nORDER BY datetime",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1239,9 +1420,9 @@
   },
   "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {},
-  "timezone": "browser",
+  "timezone": "utc",
   "title": "PYRE",
   "uid": "pyre-dashboard",
-  "version": 32,
+  "version": 15,
   "weekStart": ""
 }
