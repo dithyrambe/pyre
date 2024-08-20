@@ -1,0 +1,5 @@
+Date de comptabilisation;Libelle simplifie;Libelle operation;Reference;Informations complementaires;Type operation;Categorie;Sous categorie;Debit;Credit;Date operation;Date de valeur;Pointage operation
+01/01/2024;Libelle 1;Libelle 1 extended;ABC123;12345 CB****1234-51,20EUR 1 EURO = 1,000000;Carte bancaire;Categorie 1;Sous-categorie 1;-12,34;;01/01/2024;01/01/2024;0
+01/01/2024;ECHEANCE DE CREDIT;ECHEANCE PRET;123456;DONT CAP   1500,00 ASS.    0,00E-     INT.   500,00 COM.    0,00E;Pret;Banque et assurances;Credit;-2000,00;;12/08/2024;10/08/2024;0
+02/01/2024;Deliveroo FR France;Deliveroo FR France;ABC1234;12345 CB****1234-42,21EUR 1 EURO = 1,000000;Carte bancaire;Alimentation;Restauration rapide;-42,21;;12/08/2024;12/08/2024;0
+29/01/2024;VIREMENT ENTREPRISE;VIREMENT ENTREPRISE;12K45K6;;Virement recu;A categoriser - rentree d'argent;Virement recu - a categoriser;;+3000,00;29/01/2024;29/01/2024;0
