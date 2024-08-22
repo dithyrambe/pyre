@@ -7,12 +7,17 @@ from pyre.budget.transaction_loader import TransactionLoader
 
 
 class BanquePopulaireLoader(TransactionLoader):
-    SEP = ";"
-    DECIMAL = ","
-    ENCODING = "latin"
+    def __init__(
+        self,
+        sep: str = ";",
+        decimal: str = ",",
+        encoding: str = "latin",
+        strict: bool = True,
+    ):
+        TransactionLoader.__init__(self, sep=sep, decimal=decimal, encoding=encoding, strict=strict)
 
     def read_raw(self, path: str | Path) -> pd.DataFrame:
-        return pd.read_csv(path, sep=self.SEP, decimal=self.DECIMAL, encoding=self.ENCODING)
+        return pd.read_csv(path, sep=self.sep, decimal=self.decimal, encoding=self.encoding)
 
     def get_event_date(self, df: pd.DataFrame) -> pd.Series:
         return df["Date de comptabilisation"].apply(

@@ -5,6 +5,10 @@ from pathlib import Path
 import pandas as pd
 
 
+class SchemaValidationException(Exception):
+    ...
+
+
 @dataclass
 class Column:
     name: str
@@ -15,9 +19,27 @@ class Column:
 class Schema:
     columns: list[Column]
 
+    @property
+    def colnames(self) -> list[str]:
+        return [col.name for col in self.columns]
 
-SCHEMA = Schema(
-    [
+    @property
+    def coltypes(self) -> list[type]:
+        return [col.type for col in self.columns]
+
+    def validate(self, df: pd.DataFrame) -> None:
+        expected_types = {col.name: {col.type} for col in self.columns}
+        actual_types = {col: set(df[col].apply(type).values) for col in df.columns}
+        if actual_types != expected_types:
+            raise SchemaValidationException(
+                f"Dataframe doesn't comply with schema."
+                f" Following columns have (some) wrong types: "
+                f"{set(col for col, types in actual_types.items() if types != expected_types[col])}"
+            )
+
+
+TRANSACTION_SCHEMA = Schema(
+    columns = [
         Column(name="event_date", type=str),
         Column(name="event_datetime", type=str),
         Column(name="description", type=str),
@@ -29,9 +51,17 @@ SCHEMA = Schema(
 
 
 class TransactionLoader(ABC):
-    SEP = ","
-    DECIMAL = "."
-    ENCODING = "utf-8"
+    def __init__(
+        self,
+        sep: str = ";",
+        decimal: str = ",",
+        encoding: str = "latin",
+        strict: bool = True,
+    ):
+        self.sep = sep
+        self.decimal = decimal
+        self.encoding = encoding
+        self.strict = strict
 
     def read(self, path: str | Path) -> pd.DataFrame:
         raw = self.read_raw(path=path)
@@ -46,6 +76,8 @@ class TransactionLoader(ABC):
                 subcategory=self.get_subcategory(raw),
             )
         )
+        if self.strict:
+            TRANSACTION_SCHEMA.validate(df)
         return df
         
     @abstractmethod
