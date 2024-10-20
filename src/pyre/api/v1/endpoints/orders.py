@@ -21,7 +21,7 @@ def get_orders(
 ):
     orders = crud.get_orders(db=db, ticker=ticker, start_datetime=start_datetime, end_datetime=end_datetime)
     return orders
-    
+
 
 @router.get("/{id}", response_model=Order)
 def get_order_by_id(id: int, db: Session = Depends(get_db)):

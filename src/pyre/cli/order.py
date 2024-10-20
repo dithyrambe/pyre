@@ -32,7 +32,7 @@ def list(
     """List all market orders passed"""
     client = _get_client()
     response = client.get(
-        "/", 
+        "/",
         params={
             "ticker": ticker,
             "start_datetime": start_datetime,
@@ -40,7 +40,7 @@ def list(
         }
     )
     orders = response.json()
-    table = pd.DataFrame.from_records(orders)
+    table = pd.DataFrame.from_records(orders).sort_values("id")
     render_table(table)
 
 
