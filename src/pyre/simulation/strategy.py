@@ -34,7 +34,7 @@ class MonthlyDCA(Strategy):
             self._payments.append({"date": date, "savings": self.amount})
             return principal + self.amount
         return principal
-    
+
     @property
     def payments(self) -> pd.Series:
         return pd.DataFrame.from_records(self._payments).set_index("date")["savings"]
