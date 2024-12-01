@@ -6,8 +6,8 @@ Base = declarative_base()
 
 
 class StockData(Base):
-    __tablename__ = 'stock_data'
-    
+    __tablename__ = "stock_data"
+
     datetime = Column(DateTime, primary_key=True)
     ticker = Column(String, primary_key=True)
     open = Column(Double, nullable=True)
@@ -18,12 +18,11 @@ class StockData(Base):
 
 
 class Order(Base):
-    __tablename__ = 'orders'
-    
+    __tablename__ = "orders"
+
     id = Column(Integer, primary_key=True, index=True)
     datetime = Column(DateTime, index=True)
     ticker = Column(String, index=True)
     quantity = Column(Double)
     price = Column(Double)
     fees = Column(Double)
-    

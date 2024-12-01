@@ -12,7 +12,7 @@ def get_date_boundaries(
     start_date: str, end_date: Optional[str] = None, duration: Optional[int] = None
 ) -> Tuple[Date, Date]:
     _start_date = pendulum.parse(start_date).date()
-    
+
     if end_date is not None:
         _end_date = pendulum.parse(end_date).date()
         return _start_date, _end_date
@@ -35,7 +35,9 @@ def plot(df: pd.DataFrame, colors: Optional[List[str]] = None) -> None:
     print(fig.show(legend=True))
 
 
-def render_table(df: pd.DataFrame, title: Optional[str] = None, colors: Optional[List[str]] = None) -> None:
+def render_table(
+    df: pd.DataFrame, title: Optional[str] = None, colors: Optional[List[str]] = None
+) -> None:
     _colors = iter(colors) if colors is not None else cycle(["red", "yellow", "green", "blue"])
 
     table = Table(title=title)

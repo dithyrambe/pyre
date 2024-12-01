@@ -30,7 +30,9 @@ class MonthlyDCA(Strategy):
         self._payments = []
 
     def execute(self, date: Date, principal: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
-        if is_between(date, self.start_date, self.end_date) and date.is_same_day(date.start_of("month")):
+        if is_between(date, self.start_date, self.end_date) and date.is_same_day(
+            date.start_of("month")
+        ):
             self._payments.append({"date": date, "savings": self.amount})
             return principal + self.amount
         return principal
@@ -40,5 +42,4 @@ class MonthlyDCA(Strategy):
         return pd.DataFrame.from_records(self._payments).set_index("date")["savings"]
 
 
-class LumpSum(Strategy):
-    ...
+class LumpSum(Strategy): ...

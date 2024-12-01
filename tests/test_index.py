@@ -12,7 +12,7 @@ from pyre.simulation.index import Index
 def dummy_index_data():
     return pd.DataFrame(
         {"Close": [1.0, 3.0, 4.0]},
-        index=pd.Index(pd.to_datetime(["2023-01-02", "2023-01-04", "2023-01-05"]))
+        index=pd.Index(pd.to_datetime(["2023-01-02", "2023-01-04", "2023-01-05"])),
     )
 
 
@@ -37,9 +37,8 @@ def test_interpolate(history: MagicMock, dummy_index_data: pd.DataFrame):
     pd.testing.assert_frame_equal(
         index.data,
         pd.DataFrame(
-            {"Close": [1.0, 2.0, 3.0, 4.0]},
-            index=pd.date_range("2023-01-02", "2023-01-05")
-        )
+            {"Close": [1.0, 2.0, 3.0, 4.0]}, index=pd.date_range("2023-01-02", "2023-01-05")
+        ),
     )
 
 
@@ -51,7 +50,7 @@ def test_variations(history: MagicMock, dummy_index_data: pd.DataFrame):
     idx.get_historical_data(start_date=ORIGIN)
     pd.testing.assert_series_equal(
         idx.get_variations(),
-        pd.Series([None, 1.0, 1.0/2, 1.0/3], index=idx.data.index, name="Close"),
+        pd.Series([None, 1.0, 1.0 / 2, 1.0 / 3], index=idx.data.index, name="Close"),
     )
 
 
@@ -61,7 +60,7 @@ def test_variation_mean(history: MagicMock, dummy_index_data: pd.DataFrame):
 
     idx = Index("SYMBOL")
     idx.get_historical_data(start_date=ORIGIN)
-    assert idx.get_variation_mean() == np.mean([1, 1/2, 1/3])
+    assert idx.get_variation_mean() == np.mean([1, 1 / 2, 1 / 3])
 
 
 @patch("pyre.simulation.index.yf.Ticker.history")
@@ -70,4 +69,4 @@ def test_variation_std(history: MagicMock, dummy_index_data: pd.DataFrame):
 
     idx = Index("SYMBOL")
     idx.get_historical_data(start_date=ORIGIN)
-    np.testing.assert_almost_equal(idx.get_variation_std(), np.std([1, 1/2, 1/3], ddof=1))
+    np.testing.assert_almost_equal(idx.get_variation_std(), np.std([1, 1 / 2, 1 / 3], ddof=1))

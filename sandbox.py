@@ -53,9 +53,7 @@ df = pd.DataFrame(data).set_index("date")
 df["Rente pea+cto"] = df["pea"] + df["cto"]
 df["Rente pea+av"] = df["pea"] + df["av"]
 (df[["Rente pea+cto", "Rente pea+av"]]).plot.line(
-    figsize=(15, 10),
-    legend=True,
-    title=f"DCA €{AMOUNT} / month for {INTERVAL.in_years()} years"
+    figsize=(15, 10), legend=True, title=f"DCA €{AMOUNT} / month for {INTERVAL.in_years()} years"
 )
 plt.show()
 plt.savefig("/tmp/fig.png", format="png")

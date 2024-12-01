@@ -12,7 +12,7 @@ from pyre.simulation.strategy import MonthlyDCA
         (pendulum.parse("2022-03-01").date(), 11_000),
         (pendulum.parse("2022-04-13").date(), 10_000),
         (pendulum.parse("2022-06-01").date(), 10_000),
-    ]
+    ],
 )
 def test_dca(date, expected):
     start_date = pendulum.parse("2022-02-01").date()

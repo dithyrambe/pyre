@@ -7,7 +7,6 @@ from pyre.config import Config, config
 
 
 def create_api(config: Config) -> FastAPI:
-
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         check_api_key(config)

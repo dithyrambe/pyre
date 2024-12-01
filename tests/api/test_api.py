@@ -23,7 +23,9 @@ def setup(request):
 
     request.addfinalizer(remove_container)
 
-    config.PYRE_DB_URL = f"{postgres.get_container_host_ip()}:{postgres.get_exposed_port(postgres.port)}"
+    config.PYRE_DB_URL = (
+        f"{postgres.get_container_host_ip()}:{postgres.get_exposed_port(postgres.port)}"
+    )
     config.PYRE_DB_USER = SecretStr(postgres.username)
     config.PYRE_DB_PASSWORD = SecretStr(postgres.password)
     with Session(create_engine()) as db:
@@ -70,9 +72,30 @@ def test_get_orders_filter_ticker(client: TestClient):
 
 def test_get_orders_filter_datetime(client: TestClient):
     with Session(create_engine()) as db:
-        order2 = Order(id=2, datetime=pendulum.parse("2020-06-01"), ticker="DEF", price=10.0, quantity=2, fees=0.1)
-        order3 = Order(id=3, datetime=pendulum.parse("2020-06-02"), ticker="DEF", price=10.0, quantity=2, fees=0.1)
-        order4 = Order(id=4, datetime=pendulum.parse("2020-06-05"), ticker="DEF", price=10.0, quantity=2, fees=0.1)
+        order2 = Order(
+            id=2,
+            datetime=pendulum.parse("2020-06-01"),
+            ticker="DEF",
+            price=10.0,
+            quantity=2,
+            fees=0.1,
+        )
+        order3 = Order(
+            id=3,
+            datetime=pendulum.parse("2020-06-02"),
+            ticker="DEF",
+            price=10.0,
+            quantity=2,
+            fees=0.1,
+        )
+        order4 = Order(
+            id=4,
+            datetime=pendulum.parse("2020-06-05"),
+            ticker="DEF",
+            price=10.0,
+            quantity=2,
+            fees=0.1,
+        )
         db.add(order2)
         db.add(order3)
         db.add(order4)
@@ -98,12 +121,9 @@ def test_post_order(client: TestClient):
         "quantity": 2.0,
         "fees": 0.1,
     }
-    response = client.post(
-        "/v1/orders/",
-        json=order_data
-    )
+    response = client.post("/v1/orders/", json=order_data)
     orders_response = client.get("/v1/orders")
-    assert response.json() == order_data 
+    assert response.json() == order_data
     assert len(orders_response.json()) == 2
 
 
@@ -116,10 +136,7 @@ def test_update_order(client: TestClient):
         "quantity": 2.0,
         "fees": 0.1,
     }
-    _ = client.post(
-        "/v1/orders/",
-        json=order_data
-    )
+    _ = client.post("/v1/orders/", json=order_data)
     orders_response = client.get("/v1/orders")
     orders = orders_response.json()
     assert len(orders) == 1
@@ -145,10 +162,7 @@ def test_bulk_upsert(client: TestClient):
             "fees": 0.1,
         },
     ]
-    _ = client.post(
-        "/v1/orders/bulk",
-        json=orders_data
-    )
+    _ = client.post("/v1/orders/bulk", json=orders_data)
     orders_response = client.get("/v1/orders")
     assert orders_response.json() == orders_data
 
@@ -157,4 +171,3 @@ def test_delete_order(client: TestClient):
     _ = client.delete("/v1/orders/1")
     response = client.get("/v1/orders")
     assert len(response.json()) == 0
-

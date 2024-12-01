@@ -20,10 +20,12 @@ def dca(
     seed: float = typer.Option(0.0, help="Seed principal"),
     start_date: str = typer.Option(None, help="Date to start simulations"),
     end_date: str = typer.Option(None, help="Date to start simulations"),
-    duration: int = typer.Option(10, help="Duration of the simulation in years (ignore if --end-date is passed)"),
+    duration: int = typer.Option(
+        10, help="Duration of the simulation in years (ignore if --end-date is passed)"
+    ),
     n_sim: int = typer.Option(100, "-n", "--n-sim", help="Number of simulations to draw"),
     graph: bool = typer.Option(False, help="Wether to plot graph"),
-    quiet: bool = typer.Option(False, help="Plot raw text")
+    quiet: bool = typer.Option(False, help="Plot raw text"),
 ) -> None:
     _start_date, _end_date = get_date_boundaries(start_date, end_date, duration)
 
@@ -36,7 +38,9 @@ def dca(
     )
 
     _quantiles = np.quantile(principals, q=[0.1, 0.5, 0.9], axis=1)
-    quantiles = pd.DataFrame(_quantiles.T, columns=["p10", "p50", "p90"], index=pd.Index(dates, name="date"))
+    quantiles = pd.DataFrame(
+        _quantiles.T, columns=["p10", "p50", "p90"], index=pd.Index(dates, name="date")
+    )
     quantiles = quantiles.join(dca.payments)
     quantiles["savings"] = quantiles["savings"].fillna(0).cumsum() + seed
 

@@ -14,6 +14,7 @@ app.add_typer(typer_instance=order, name="order")
 
 console = Console()
 
+
 def show_version(flag: bool):
     if flag:
         from importlib.metadata import version
@@ -24,12 +25,9 @@ def show_version(flag: bool):
 
 @app.callback()
 def main(
-    version: bool = typer.Option(
-        None, "--version", callback=show_version, help="Show version."
-    ),
+    version: bool = typer.Option(None, "--version", callback=show_version, help="Show version."),
 ):
     """Pyre CLI"""
-
 
 
 if __name__ == "__main__":

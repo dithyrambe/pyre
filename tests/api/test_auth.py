@@ -13,14 +13,28 @@ from pyre.config import Config
     argnames=("config", "client_key", "expected_code"),
     argvalues=[
         (Config(PYRE_AUTH_DISABLED=True), "", status.HTTP_200_OK),
-        (Config(PYRE_AUTH_DISABLED=False, PYRE_API_KEY=SecretStr("ThisIsAValidSecretKey")), "", status.HTTP_403_FORBIDDEN),
-        (Config(PYRE_AUTH_DISABLED=False, PYRE_API_KEY=SecretStr("ThisIsAValidSecretKey")), "ThisIsAValidSecretKey", status.HTTP_200_OK),
-        (Config(PYRE_AUTH_DISABLED=False, PYRE_API_KEY=SecretStr("ThisIsAValidSecretKey")), "NotMatching", status.HTTP_401_UNAUTHORIZED),
-    ]
+        (
+            Config(PYRE_AUTH_DISABLED=False, PYRE_API_KEY=SecretStr("ThisIsAValidSecretKey")),
+            "",
+            status.HTTP_403_FORBIDDEN,
+        ),
+        (
+            Config(PYRE_AUTH_DISABLED=False, PYRE_API_KEY=SecretStr("ThisIsAValidSecretKey")),
+            "ThisIsAValidSecretKey",
+            status.HTTP_200_OK,
+        ),
+        (
+            Config(PYRE_AUTH_DISABLED=False, PYRE_API_KEY=SecretStr("ThisIsAValidSecretKey")),
+            "NotMatching",
+            status.HTTP_401_UNAUTHORIZED,
+        ),
+    ],
 )
 @patch("pyre.db.engine.create_engine")
 @patch("pyre.db.engine.Session")
-def test_auth_toggle(session: MagicMock, engine: MagicMock, config: Config, client_key: str, expected_code: int):
+def test_auth_toggle(
+    session: MagicMock, engine: MagicMock, config: Config, client_key: str, expected_code: int
+):
     api = create_api(config)
     client = TestClient(api)
 

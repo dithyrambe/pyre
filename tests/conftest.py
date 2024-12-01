@@ -15,4 +15,3 @@ def urth():
     idx = Index(symbol="URTH")
     idx.data = data
     return idx
-    

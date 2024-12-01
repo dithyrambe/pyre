@@ -17,9 +17,11 @@ def get_orders(
     ticker: Optional[str] = None,
     start_datetime: Optional[str] = None,
     end_datetime: Optional[str] = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
-    orders = crud.get_orders(db=db, ticker=ticker, start_datetime=start_datetime, end_datetime=end_datetime)
+    orders = crud.get_orders(
+        db=db, ticker=ticker, start_datetime=start_datetime, end_datetime=end_datetime
+    )
     return orders
 
 
@@ -44,4 +46,3 @@ def upsert_orders(orders: List[Order], db: Session = Depends(get_db)):
 @router.delete("/{id}")
 def delete_order_by_id(id: int, db: Session = Depends(get_db)):
     crud.delete_order_by_id(db=db, id=id)
-

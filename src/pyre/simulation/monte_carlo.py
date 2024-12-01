@@ -12,17 +12,22 @@ class MonteCarloSimulation:
         self.index = index
         self.strategy = strategy
 
-    def run(self, seed: float, start_date: Date, end_date: Date, n: int = 1, progress: bool = False):
+    def run(
+        self, seed: float, start_date: Date, end_date: Date, n: int = 1, progress: bool = False
+    ):
         date_range = (end_date.subtract(days=1) - start_date).range("days")
         dates = [*date_range]
 
         mean = self.index.get_variation_mean()
         std = self.index.get_variation_std()
         variations = np.random.normal(loc=mean, scale=std, size=(len(dates), n))
-        return dates, self.simulate(seed=seed, dates=dates, variations=variations, progress=progress)
+        return dates, self.simulate(
+            seed=seed, dates=dates, variations=variations, progress=progress
+        )
 
-
-    def simulate(self, seed: float, dates: list[Date], variations: np.ndarray, progress: bool = False) -> pd.DataFrame:
+    def simulate(
+        self, seed: float, dates: list[Date], variations: np.ndarray, progress: bool = False
+    ) -> pd.DataFrame:
         principals = seed * np.ones(variations.shape[1])
         _principals = np.ones_like(variations)
         iterator = enumerate(zip(dates, variations))

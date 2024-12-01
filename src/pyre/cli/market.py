@@ -15,7 +15,8 @@ from pyre.db.schemas import Order, StockData
 from pyre.exceptions import PyreException
 
 
-NULL = psycopg2.extensions.AsIs('NULL')
+NULL = psycopg2.extensions.AsIs("NULL")
+
 
 class TimePeriod(str, Enum):
     ONE_DAY = "1d"
@@ -60,13 +61,14 @@ COLUMN_MAPPING = {
 
 market = Typer(add_completion=False)
 
+
 def _download(
     tickers: List[str],
     start_datetime: Optional[str] = None,
     end_datetime: Optional[str] = None,
-    period: str = "max", 
-    interval: str = "1d"
-    ) -> pd.DataFrame:
+    period: str = "max",
+    interval: str = "1d",
+) -> pd.DataFrame:
     data = yfinance.download(
         tickers=" ".join(tickers),
         start=start_datetime,
@@ -76,11 +78,9 @@ def _download(
         ignore_tz=True,
     )
     df = (
-        data
-        .stack("Ticker", future_stack=True)
+        data.stack("Ticker", future_stack=True)
         .reset_index()
-        .rename(columns=COLUMN_MAPPING)
-        [[*set(COLUMN_MAPPING.values())]]
+        .rename(columns=COLUMN_MAPPING)[[*set(COLUMN_MAPPING.values())]]
     )
     return df
 
@@ -101,8 +101,12 @@ def _dump_records(db: Session, records: pd.DataFrame):
 @market.command()
 def fetch(
     ticker: str,
-    start_datetime: Optional[str] = typer.Option(None, help="Start datetime to fetch data from (inclusive)"),
-    end_datetime: Optional[str] = typer.Option(None, help="Start datetime to fetch data to (exclusive)"),
+    start_datetime: Optional[str] = typer.Option(
+        None, help="Start datetime to fetch data from (inclusive)"
+    ),
+    end_datetime: Optional[str] = typer.Option(
+        None, help="Start datetime to fetch data to (exclusive)"
+    ),
     period: TimePeriod = typer.Option("1mo", help="Period of time to fetch data"),
     interval: TimeInterval = typer.Option("1d", help="Time interval"),
 ) -> None:
@@ -123,8 +127,10 @@ def fetch(
 
 @market.command()
 def refresh(
-    forever: bool = typer.Option(False, help="Whether to crawl forever"), 
-    polling_interval: int = typer.Option(config.PYRE_POLLING_INTERVAL, help="Time interval to fetch data again")
+    forever: bool = typer.Option(False, help="Whether to crawl forever"),
+    polling_interval: int = typer.Option(
+        config.PYRE_POLLING_INTERVAL, help="Time interval to fetch data again"
+    ),
 ):
     """Crawl latest market data"""
     engine = create_engine()

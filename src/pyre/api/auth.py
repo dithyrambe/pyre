@@ -8,6 +8,7 @@ from pyre.exceptions import PyreException
 
 API_KEY_HEADER = APIKeyHeader(name="X-API-Key")
 
+
 def is_api_key_valid(api_key: str):
     if len(api_key) < 16:
         return False
@@ -27,9 +28,9 @@ def authorizer_factory(config: Config):
     def is_authorized(api_key: str = Security(API_KEY_HEADER)):
         if not api_key or api_key != config.PYRE_API_KEY.get_secret_value():
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Missing or invalid API key"
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing or invalid API key"
             )
+
     return is_authorized
 
 

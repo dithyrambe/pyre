@@ -13,12 +13,14 @@ def test_pea_before_min_holding():
 
     with (
         patch.object(pea, "total_contribution") as total_contribution,
-        patch.object(pea, "portfolio_value") as portfolio_value
+        patch.object(pea, "portfolio_value") as portfolio_value,
     ):
         total_contribution.return_value = 10_000
         portfolio_value.return_value = 15_000
 
-        withdrawal = Withdrawal(pct=1.0, datetime=(opening + pea.TAX_MINIMAL_HOLDING_PERIOD).subtract(years=1))
+        withdrawal = Withdrawal(
+            pct=1.0, datetime=(opening + pea.TAX_MINIMAL_HOLDING_PERIOD).subtract(years=1)
+        )
         net, tax = pea.withdraw(withdrawal=withdrawal)
         expected_tax = 5_000 * PFU
         expected_net = 15_000 - expected_tax
@@ -32,15 +34,16 @@ def test_pea_after_min_holding():
 
     with (
         patch.object(pea, "total_contribution") as total_contribution,
-        patch.object(pea, "portfolio_value") as portfolio_value
+        patch.object(pea, "portfolio_value") as portfolio_value,
     ):
         total_contribution.return_value = 10_000
         portfolio_value.return_value = 15_000
 
-        withdrawal = Withdrawal(pct=1.0, datetime=(opening + pea.TAX_MINIMAL_HOLDING_PERIOD).add(years=1))
+        withdrawal = Withdrawal(
+            pct=1.0, datetime=(opening + pea.TAX_MINIMAL_HOLDING_PERIOD).add(years=1)
+        )
         net, tax = pea.withdraw(withdrawal=withdrawal)
         expected_tax = 5_000 * PS
         expected_net = 15_000 - expected_tax
         assert tax == expected_tax
         assert net == expected_net
-
