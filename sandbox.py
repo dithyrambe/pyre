@@ -10,14 +10,17 @@ plt.style.use("ggplot")
 
 
 INVESTMENT_DURATION = pendulum.Duration(years=20)
-AMOUNT = 3000.0
+AMOUNT = 4750.0
 PCT = 0.035
-START = pendulum.parse("2024-11-01")
+START = pendulum.parse("2025-01-01")
 END = START + INVESTMENT_DURATION
-ANNUALIZED_RETURN = 0.075
+INFLATION = 0.03
+ANNUALIZED_RETURN = 0.05
 INTERVAL = END - START
 
-pea = PEA(fees=0.00, annualized_return=ANNUALIZED_RETURN, opening_date=START)  # type: ignore
+pea = PEA(fees=0.00, annualized_return=ANNUALIZED_RETURN, opening_date=pendulum.parse("2024-05-01"))  # type: ignore
+pea.contribute(Contribution(amount=125_000, datetime=pendulum.parse("2024-12-01")))
+
 cto = CTO(fees=0.00, annualized_return=ANNUALIZED_RETURN, opening_date=START)  # type: ignore
 av = AV(fees=0.010, annualized_return=ANNUALIZED_RETURN, opening_date=START)  # type: ignore
 
@@ -56,4 +59,3 @@ df["Rente pea+av"] = df["pea"] + df["av"]
     figsize=(15, 10), legend=True, title=f"DCA €{AMOUNT} / month for {INTERVAL.in_years()} years"
 )
 plt.show()
-plt.savefig("/tmp/fig.png", format="png")
