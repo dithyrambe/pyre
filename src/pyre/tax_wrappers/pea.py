@@ -8,7 +8,7 @@ class PEA(TaxWrapper):
     CONTRIBUTION_LIMIT = 150_000.0
     TAX_MINIMAL_HOLDING_PERIOD = pendulum.Duration(years=5)
 
-    def withdraw(self, withdrawal: Withdrawal) -> tuple[float, float]:
+    def apply_taxation(self, withdrawal: Withdrawal) -> tuple[float, float]:
         tax_rate = PRELEVEMENT_FORFAITAIRE_UNIQUE
         if withdrawal.datetime >= (self.opening_date + self.TAX_MINIMAL_HOLDING_PERIOD):
             tax_rate = PRELEVEMENT_SOCIAUX

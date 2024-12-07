@@ -3,8 +3,8 @@ from pyre.tax_wrappers.base import Contribution, TaxWrapper, Withdrawal
 
 
 class DummyTaxWrapper(TaxWrapper):
-    def withdraw(self, withdrawal: Withdrawal) -> tuple[float, float]:
-        return super().withdraw(withdrawal)
+    def apply_taxation(self, withdrawal: Withdrawal) -> tuple[float, float]:
+        return super().apply_taxation(withdrawal)
 
 
 def test_withdrawal_persistence():

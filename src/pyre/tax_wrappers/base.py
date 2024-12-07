@@ -77,15 +77,21 @@ class TaxWrapper(ABC):
             raise ValueError(f"Contribution limit is {self.CONTRIBUTION_LIMIT}")
         self.contributions.append(contribution)
 
-    @abstractmethod
     def withdraw(self, withdrawal: Withdrawal, dry_run: bool = False) -> tuple[float, float]:
-        gross_withdraw = self._get_gross_amount(withdrawal)
         if not dry_run:
-            self.withdrawals.append(withdrawal)
-        return gross_withdraw, 0.0
+            datetime = withdrawal.datetime
+            amount = withdrawal.amount or withdrawal.pct * self.portfolio_value(withdrawal.datetime)
+            self.withdrawals.append(Withdrawal(datetime=datetime, amount=amount))
+        net_amount, tax_amount = self.apply_taxation(withdrawal)
+        return net_amount, tax_amount
 
     def _get_gross_amount(self, withdrawal: Withdrawal) -> float:
         gross_withdraw = withdrawal.amount
         if withdrawal.pct:
             gross_withdraw = withdrawal.pct * self.portfolio_value(withdrawal.datetime)
         return gross_withdraw
+
+    @abstractmethod
+    def apply_taxation(self, withdrawal: Withdrawal) -> tuple[float, float]:
+        gross_amount = self._get_gross_amount(withdrawal)
+        return gross_amount, 0.0
