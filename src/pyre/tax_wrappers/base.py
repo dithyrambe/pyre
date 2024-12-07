@@ -39,28 +39,29 @@ class TaxWrapper(ABC):
         self.contributions: list[Contribution] = []
         self.withdrawals: list[Withdrawal] = []
 
-    def total_contribution(self, datetime: DateTime):
+    def total_contribution(self, datetime: DateTime) -> float:
         return sum(
             _.amount
             for _ in filter(lambda contrib: contrib.datetime <= datetime, self.contributions)
         )
 
     def portfolio_value(self, datetime: DateTime):
+        contributions = [*filter(lambda c: c.datetime <= datetime, self.contributions)]
+        withdrawals = [*filter(lambda w: w.datetime < datetime, self.withdrawals)]
+
         months_since_contributions = [
-            (datetime - contrib.datetime).in_months() for contrib in self.contributions
+            (datetime - contrib.datetime).in_months() for contrib in contributions
         ]
         months_since_withdrawals = [
-            (datetime - withdrawal.datetime).in_months() for withdrawal in self.withdrawals
+            (datetime - withdrawal.datetime).in_months() for withdrawal in withdrawals
         ]
         compounded_contributions = [
             contrib.amount * (1 + self.monthly_return) ** months
-            for contrib, months in zip(self.contributions, months_since_contributions)
-            if months >= 0
+            for contrib, months in zip(contributions, months_since_contributions)
         ]
         compounded_withdrawals = [
             withdrawal.amount * (1 + self.monthly_return) ** months
-            for withdrawal, months in zip(self.withdrawals, months_since_withdrawals)
-            if months >= 0
+            for withdrawal, months in zip(withdrawals, months_since_withdrawals)
         ]
         return sum(compounded_contributions) - sum(compounded_withdrawals)
 
