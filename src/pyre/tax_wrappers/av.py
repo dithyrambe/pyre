@@ -17,8 +17,12 @@ class AV(TaxWrapper):
     def withdraw(self, withdrawal: Withdrawal) -> tuple[float, float]:
         total_contribution = self.total_contribution(withdrawal.datetime)
         portfolio_value = self.portfolio_value(withdrawal.datetime)
-        gross_withdraw = withdrawal.pct * portfolio_value
-        gain = self.gain(withdrawal.datetime) * withdrawal.pct
+        gross_amount = self._get_gross_amount(withdrawal)
+        gain = (
+            self.gain(withdrawal.datetime) * gross_amount / portfolio_value
+            if portfolio_value
+            else 0
+        )
 
         if (
             withdrawal.datetime >= (self.opening_date + self.TAX_MINIMAL_HOLDING_PERIOD)
@@ -41,4 +45,4 @@ class AV(TaxWrapper):
             tax = tax_ps + tax_pf + tax_isr
         else:
             tax = gain * PFU
-        return gross_withdraw - tax, tax
+        return gross_amount - tax, tax
