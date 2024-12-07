@@ -14,7 +14,9 @@ class PEA(TaxWrapper):
             tax_rate = PRELEVEMENT_SOCIAUX
         portfolio_value = self.portfolio_value(withdrawal.datetime)
 
-        gross_withdraw = withdrawal.pct * portfolio_value
-        gain = self.gain(withdrawal.datetime) * withdrawal.pct
+        gross_amout = self._get_gross_amount(withdrawal)
+        gain = (
+            self.gain(withdrawal.datetime) * gross_amout / portfolio_value if portfolio_value else 0
+        )
         tax = tax_rate * gain
-        return gross_withdraw - tax, tax
+        return gross_amout - tax, tax

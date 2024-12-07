@@ -14,8 +14,13 @@ class Contribution:
 
 @dataclass
 class Withdrawal:
-    pct: float
     datetime: DateTime
+    amount: float | None = None
+    pct: float | None = None
+
+    def __post_init__(self):
+        if self.amount is None and self.pct is None:
+            raise ValueError("Either amount or pct must be specified.")
 
 
 class TaxWrapper(ABC):
@@ -65,5 +70,11 @@ class TaxWrapper(ABC):
 
     @abstractmethod
     def withdraw(self, withdrawal: Withdrawal) -> tuple[float, float]:
-        gross_withdraw = withdrawal.pct * self.portfolio_value(withdrawal.datetime)
+        gross_withdraw = self._get_gross_amount(withdrawal)
         return gross_withdraw, 0.0
+
+    def _get_gross_amount(self, withdrawal: Withdrawal) -> float:
+        gross_withdraw = withdrawal.amount
+        if withdrawal.pct:
+            gross_withdraw = withdrawal.pct * self.portfolio_value(withdrawal.datetime)
+        return gross_withdraw
