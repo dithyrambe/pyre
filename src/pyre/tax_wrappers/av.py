@@ -14,7 +14,7 @@ class AV(TaxWrapper):
     PRELEVEMENT_FORFAITAIRE = PF = 0.075
     SOFT_CONTRIBUTION_LIMIT = 150_000
 
-    def withdraw(self, withdrawal: Withdrawal) -> tuple[float, float]:
+    def apply_taxation(self, withdrawal: Withdrawal) -> tuple[float, float]:
         total_contribution = self.total_contribution(withdrawal.datetime)
         portfolio_value = self.portfolio_value(withdrawal.datetime)
         gross_amount = self._get_gross_amount(withdrawal)
