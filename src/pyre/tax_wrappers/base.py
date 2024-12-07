@@ -45,6 +45,19 @@ class TaxWrapper(ABC):
             for _ in filter(lambda contrib: contrib.datetime <= datetime, self.contributions)
         )
 
+    def residual_contribution(self, datetime: DateTime) -> float:
+        events = sorted(self.contributions + self.withdrawals, key=lambda e: e.datetime)
+
+        residual_contribution = 0.0
+        for event in filter(lambda e: e.datetime <= datetime, events):
+            if isinstance(event, Contribution):
+                residual_contribution += event.amount
+            if isinstance(event, Withdrawal) and event.datetime < datetime:
+                residual_contribution -= (
+                    event.amount * residual_contribution / self.portfolio_value(event.datetime)
+                )
+        return residual_contribution
+
     def portfolio_value(self, datetime: DateTime):
         contributions = [*filter(lambda c: c.datetime <= datetime, self.contributions)]
         withdrawals = [*filter(lambda w: w.datetime < datetime, self.withdrawals)]
@@ -66,7 +79,7 @@ class TaxWrapper(ABC):
         return sum(compounded_contributions) - sum(compounded_withdrawals)
 
     def gain(self, datetime: DateTime) -> float:
-        return self.portfolio_value(datetime) - self.total_contribution(datetime)
+        return self.portfolio_value(datetime) - self.residual_contribution(datetime)
 
     def contribute(self, contribution: Contribution) -> None:
         if self.contributions and self.contributions[-1].datetime > contribution.datetime:
