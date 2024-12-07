@@ -37,6 +37,7 @@ class TaxWrapper(ABC):
         self.annualized_return = annualized_return - self.fees
         self.monthly_return = (1 + self.annualized_return) ** (1 / 12) - 1
         self.contributions: list[Contribution] = []
+        self.withdrawals: list[Withdrawal] = []
 
     def total_contribution(self, datetime: DateTime):
         return sum(
@@ -48,12 +49,20 @@ class TaxWrapper(ABC):
         months_since_contributions = [
             (datetime - contrib.datetime).in_months() for contrib in self.contributions
         ]
+        months_since_withdrawals = [
+            (datetime - withdrawal.datetime).in_months() for withdrawal in self.withdrawals
+        ]
         compounded_contributions = [
             contrib.amount * (1 + self.monthly_return) ** months
             for contrib, months in zip(self.contributions, months_since_contributions)
             if months >= 0
         ]
-        return sum(compounded_contributions)
+        compounded_withdrawals = [
+            withdrawal.amount * (1 + self.monthly_return) ** months
+            for withdrawal, months in zip(self.withdrawals, months_since_withdrawals)
+            if months >= 0
+        ]
+        return sum(compounded_contributions) - sum(compounded_withdrawals)
 
     def gain(self, datetime: DateTime) -> float:
         return self.portfolio_value(datetime) - self.total_contribution(datetime)
@@ -69,8 +78,10 @@ class TaxWrapper(ABC):
         self.contributions.append(contribution)
 
     @abstractmethod
-    def withdraw(self, withdrawal: Withdrawal) -> tuple[float, float]:
+    def withdraw(self, withdrawal: Withdrawal, dry_run: bool = False) -> tuple[float, float]:
         gross_withdraw = self._get_gross_amount(withdrawal)
+        if not dry_run:
+            self.withdrawals.append(withdrawal)
         return gross_withdraw, 0.0
 
     def _get_gross_amount(self, withdrawal: Withdrawal) -> float:
