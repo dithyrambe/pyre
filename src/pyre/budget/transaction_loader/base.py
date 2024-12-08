@@ -1,5 +1,7 @@
+import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from hashlib import sha1
 from pathlib import Path
 
 import pandas as pd
@@ -39,6 +41,7 @@ class Schema:
 
 TRANSACTION_SCHEMA = Schema(
     columns=[
+        Column(name="id", type=str),
         Column(name="event_date", type=str),
         Column(name="event_datetime", type=str),
         Column(name="description", type=str),
@@ -72,8 +75,15 @@ class TransactionLoader(ABC):
             category=self.get_category(raw),
             subcategory=self.get_subcategory(raw),
         )
+        df = self.impute_ids(df)
         if self.strict:
             TRANSACTION_SCHEMA.validate(df)
+        return df
+
+    def impute_ids(self, df):
+        df["id"] = df.apply(
+            lambda row: sha1(json.dumps(row.to_dict()).encode()).hexdigest(), axis=1
+        )
         return df
 
     @abstractmethod
