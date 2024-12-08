@@ -62,20 +62,21 @@ class TaxWrapper(ABC):
         contributions = [*filter(lambda c: c.datetime <= datetime, self.contributions)]
         withdrawals = [*filter(lambda w: w.datetime < datetime, self.withdrawals)]
 
-        months_since_contributions = [
-            (datetime - contrib.datetime).in_months() for contrib in contributions
-        ]
-        months_since_withdrawals = [
-            (datetime - withdrawal.datetime).in_months() for withdrawal in withdrawals
-        ]
-        compounded_contributions = [
-            contrib.amount * (1 + self.monthly_return) ** months
-            for contrib, months in zip(contributions, months_since_contributions)
-        ]
-        compounded_withdrawals = [
-            withdrawal.amount * (1 + self.monthly_return) ** months
-            for withdrawal, months in zip(withdrawals, months_since_withdrawals)
-        ]
+        months_since_contributions = np.array(
+            [(datetime - contrib.datetime).in_months() for contrib in contributions]
+        )
+        months_since_withdrawals = np.array(
+            [(datetime - withdrawal.datetime).in_months() for withdrawal in withdrawals]
+        )
+        contrib_amounts = np.array([_.amount for _ in contributions])
+        withdraw_amounts = np.array([_.amount for _ in withdrawals])
+
+        compounded_contributions = (
+            contrib_amounts * (1 + self.monthly_return) ** months_since_contributions
+        )
+        compounded_withdrawals = (
+            withdraw_amounts * (1 + self.monthly_return) ** months_since_withdrawals
+        )
         return sum(compounded_contributions) - sum(compounded_withdrawals)
 
     def gain(self, datetime: DateTime) -> float:
