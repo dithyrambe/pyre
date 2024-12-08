@@ -35,3 +35,10 @@ CATEGORIES = {
         "given",
     ],
 }
+
+
+LABELS = [
+    f"{category}/{subcategory}"
+    for category, subcategories in CATEGORIES.items()
+    for subcategory in subcategories
+]
