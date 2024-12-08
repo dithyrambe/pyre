@@ -12,10 +12,10 @@ def test_pea_before_min_holding():
     pea = PEA(opening_date=opening)
 
     with (
-        patch.object(pea, "total_contribution") as total_contribution,
+        patch.object(pea, "residual_contribution") as residual_contribution,
         patch.object(pea, "portfolio_value") as portfolio_value,
     ):
-        total_contribution.return_value = 10_000
+        residual_contribution.return_value = 10_000
         portfolio_value.return_value = 15_000
 
         withdrawal = Withdrawal(
@@ -33,10 +33,10 @@ def test_pea_after_min_holding():
     pea = PEA(opening_date=opening)
 
     with (
-        patch.object(pea, "total_contribution") as total_contribution,
+        patch.object(pea, "residual_contribution") as residual_contribution,
         patch.object(pea, "portfolio_value") as portfolio_value,
     ):
-        total_contribution.return_value = 10_000
+        residual_contribution.return_value = 10_000
         portfolio_value.return_value = 15_000
 
         withdrawal = Withdrawal(

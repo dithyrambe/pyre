@@ -5,8 +5,6 @@ from pyre.tax_wrappers.constants import PRELEVEMENT_FORFAITAIRE_UNIQUE
 
 
 class CTO(TaxWrapper):
-    TAX_MINIMAL_HOLDING_PERIOD = pendulum.Duration(years=5)
-
     def apply_taxation(self, withdrawal: Withdrawal) -> tuple[float, float]:
         tax_rate = PRELEVEMENT_FORFAITAIRE_UNIQUE
         portfolio_value = self.portfolio_value(withdrawal.datetime)
