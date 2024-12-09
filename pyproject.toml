@@ -34,6 +34,8 @@ pyre = "pyre.cli.main:app"
 [dependency-groups]
 dev = [
   "ipython<9.0.0,>=8.22.1",
+  "matplotlib>=3.9.3",
+  "pyqt5>=5.15.11",
   "pytest<9.0.0,>=8.1.1",
   "ruff<1.0.0,>=0.8.1",
   "testcontainers<5.0.0,>=4.5.1",
