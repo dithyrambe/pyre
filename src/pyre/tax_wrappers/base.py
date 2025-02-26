@@ -70,7 +70,6 @@ class TaxWrapper(ABC):
         )
         contrib_amounts = np.array([_.amount for _ in contributions])
         withdraw_amounts = np.array([_.amount for _ in withdrawals])
-
         compounded_contributions = (
             contrib_amounts * (1 + self.monthly_return) ** months_since_contributions
         )
@@ -93,11 +92,17 @@ class TaxWrapper(ABC):
         self.contributions.append(contribution)
 
     def withdraw(self, withdrawal: Withdrawal, dry_run: bool = False) -> tuple[float, float]:
+        _datetime = withdrawal.datetime
+        max_amount = self.portfolio_value(_datetime)
+        _amount = (
+            min(withdrawal.amount, max_amount)
+            if withdrawal.amount is not None
+            else withdrawal.pct * max_amount
+        )
+        _withdrawal = Withdrawal(datetime=_datetime, amount=_amount)
         if not dry_run:
-            datetime = withdrawal.datetime
-            amount = withdrawal.amount or withdrawal.pct * self.portfolio_value(withdrawal.datetime)
-            self.withdrawals.append(Withdrawal(datetime=datetime, amount=amount))
-        net_amount, tax_amount = self.apply_taxation(withdrawal)
+            self.withdrawals.append(_withdrawal)
+        net_amount, tax_amount = self.apply_taxation(_withdrawal)
         return net_amount, tax_amount
 
     def _get_gross_amount(self, withdrawal: Withdrawal) -> float:

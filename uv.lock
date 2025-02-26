@@ -1057,6 +1057,7 @@ source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
     { name = "httpx" },
+    { name = "matplotlib" },
     { name = "numpy" },
     { name = "pandas" },
     { name = "pendulum" },
@@ -1064,6 +1065,7 @@ dependencies = [
     { name = "psycopg2-binary" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
+    { name = "pyqt5" },
     { name = "pyyaml" },
     { name = "sqlalchemy" },
     { name = "typer" },
@@ -1085,6 +1087,7 @@ dev = [
 requires-dist = [
     { name = "fastapi", specifier = ">=0.115.6" },
     { name = "httpx", specifier = ">=0.27.0,<0.28.0" },
+    { name = "matplotlib", specifier = ">=3.9.3" },
     { name = "numpy", specifier = ">=1.26.4,<2.0.0" },
     { name = "pandas", specifier = ">=2.2.2,<3.0.0" },
     { name = "pendulum", specifier = ">=3.0.0,<4.0.0" },
@@ -1092,6 +1095,7 @@ requires-dist = [
     { name = "psycopg2-binary", specifier = ">=2.9.9,<3.0.0" },
     { name = "pydantic", specifier = ">=2.7.3,<3.0.0" },
     { name = "pydantic-settings", specifier = ">=2.3.1,<3.0.0" },
+    { name = "pyqt5", specifier = ">=5.15.11" },
     { name = "pyyaml", specifier = ">=6.0.1,<7.0.0" },
     { name = "sqlalchemy", specifier = ">=2.0.30,<3.0.0" },
     { name = "typer", specifier = ">=0.12.3,<1.0.0" },
