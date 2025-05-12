@@ -11,11 +11,10 @@ services:
       PYRE_DB_PASSWORD: "pyre"
     ports:
       - 8000:8000
-    command: ["uvicorn", "pyre.api.main:api", "--host", "0.0.0.0", "--port", "8000"]
+    entrypoint: ["uvicorn", "pyre.api.main:api", "--host", "0.0.0.0", "--port", "8000"]
     depends_on:
       postgre:
         condition: service_healthy
-    restart: always
     healthcheck:
       test: ["CMD", "python3", "-c", "import socket; s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.settimeout(5); s.connect(('localhost', 8000)); s.close()"]
       interval: 5s
@@ -31,11 +30,11 @@ services:
       PYRE_DB_USER: "pyre"
       PYRE_DB_PASSWORD: "pyre"
       PYRE_POLLING_INTERVAL: "30"
-    command: ["pyre", "market", "refresh", "--forever"]
+      _TYPER_STANDARD_TRACEBACK: 1
+    entrypoint: ["pyre", "market", "refresh", "--forever"]
     depends_on:
       postgre:
         condition: service_healthy
-    restart: always
 
   initializer:
     image: dithyrambe/pyre
@@ -44,7 +43,7 @@ services:
     environment:
       PYRE_API_KEY: "thisisalongenoughkey"
       PYRE_ENDPOINT: "http://api:8000"
-    command: ["pyre", "order", "bulk", "/config/orders.yaml"]
+    entrypoint: ["pyre", "order", "bulk", "/config/orders.yaml"]
     volumes:
       - ./config:/config
     depends_on:
