@@ -657,9 +657,9 @@
       },
       "id": 3,
       "panels": [],
-      "repeat": "ticker",
+      "repeat": "active_ticker",
       "repeatDirection": "h",
-      "title": "$ticker",
+      "title": "$active_ticker",
       "type": "row"
     },
     {
@@ -748,7 +748,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\n datetime AS time,\n close\nFROM stock_data\nWHERE $__timeFilter(datetime)\n  AND ticker = $ticker",
+          "rawSql": "SELECT\n datetime AS time,\n close\nFROM stock_data\nWHERE $__timeFilter(datetime)\n  AND ticker = $active_ticker",
           "refId": "A",
           "sql": {
             "columns": [
@@ -777,7 +777,7 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT sum(quantity * price + fees) / sum(quantity) AS pru\r\nFROM orders\r\nWHERE ticker = $ticker ",
+          "rawSql": "SELECT sum(quantity * price + fees) / sum(quantity) AS pru\r\nFROM orders\r\nWHERE ticker = $active_ticker ",
           "refId": "B",
           "sql": {
             "columns": [
@@ -883,7 +883,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "WITH\ncombined AS (\n    SELECT\n        sd.ticker,\n        sd.datetime,\n        sd.close,\n        i.quantity\n    FROM\n        stock_data sd\n    LEFT JOIN orders i\n        ON sd.ticker = i.ticker AND sd.datetime >= i.datetime\n)\nSELECT\n    ticker,\n    datetime AS time,\n    close * SUM(quantity) AS value\nFROM\n    combined\nWHERE $__timeFilter(datetime)\n  AND ticker = $ticker\nGROUP BY \n    ticker,\n    datetime,\n    close\nORDER BY\n    datetime;",
+          "rawSql": "WITH\ncombined AS (\n    SELECT\n        sd.ticker,\n        sd.datetime,\n        sd.close,\n        i.quantity\n    FROM\n        stock_data sd\n    LEFT JOIN orders i\n        ON sd.ticker = i.ticker AND sd.datetime >= i.datetime\n)\nSELECT\n    ticker,\n    datetime AS time,\n    close * SUM(quantity) AS value\nFROM\n    combined\nWHERE $__timeFilter(datetime)\n  AND ticker = $active_ticker\nGROUP BY \n    ticker,\n    datetime,\n    close\nORDER BY\n    datetime;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -971,7 +971,7 @@
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "WITH\ncombined AS (\n    SELECT\n        sd.ticker,\n        sd.datetime,\n        sd.close,\n        i.price,\n        i.quantity,\n        i.fees\n    FROM\n        stock_data sd\n    LEFT JOIN orders i\n        ON sd.ticker = i.ticker AND sd.datetime >= i.datetime\n)\nSELECT\n    ticker,\n    datetime AS time,\n    close * SUM(quantity) - SUM(price * quantity + fees)\nFROM\n    combined\nWHERE $__timeFilter(datetime)\n  AND ticker = $ticker\nGROUP BY \n    ticker,\n    datetime,\n    close\nORDER BY\n    datetime;",
+          "rawSql": "WITH\ncombined AS (\n    SELECT\n        sd.ticker,\n        sd.datetime,\n        sd.close,\n        i.price,\n        i.quantity,\n        i.fees\n    FROM\n        stock_data sd\n    LEFT JOIN orders i\n        ON sd.ticker = i.ticker AND sd.datetime >= i.datetime\n)\nSELECT\n    ticker,\n    datetime AS time,\n    close * SUM(quantity) - SUM(price * quantity + fees)\nFROM\n    combined\nWHERE $__timeFilter(datetime)\n  AND ticker = $active_ticker\nGROUP BY \n    ticker,\n    datetime,\n    close\nORDER BY\n    datetime;",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1059,7 +1059,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT close\nFROM stock_data\nWHERE $__timeFilter(datetime) AND ticker = $ticker\nORDER BY datetime",
+          "rawSql": "SELECT close\nFROM stock_data\nWHERE $__timeFilter(datetime) AND ticker = $active_ticker\nORDER BY datetime",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1143,7 +1143,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT SUM(price * quantity + fees) / sum(quantity)\nFROM orders\nWHERE ticker = $ticker",
+          "rawSql": "SELECT SUM(price * quantity + fees) / sum(quantity)\nFROM orders\nWHERE ticker = $active_ticker",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1226,7 +1226,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT sum(quantity)\nFROM orders\nWHERE datetime <= $__timeTo() AND ticker = $ticker",
+          "rawSql": "SELECT sum(quantity)\nFROM orders\nWHERE datetime <= $__timeTo() AND ticker = $active_ticker",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1314,7 +1314,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT close / (SELECT SUM(quantity * price + fees) / SUM(quantity) FROM orders WHERE ticker = $ticker) - 1 AS performance\nFROM stock_data\nWHERE $__timeFilter(datetime) AND ticker = $ticker\nORDER BY datetime",
+          "rawSql": "SELECT close / (SELECT SUM(quantity * price + fees) / SUM(quantity) FROM orders WHERE ticker = $active_ticker) - 1 AS performance\nFROM stock_data\nWHERE $__timeFilter(datetime) AND ticker = $active_ticker\nORDER BY datetime",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1370,11 +1370,39 @@
         "skipUrlSync": false,
         "sort": 0,
         "type": "query"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "pyre"
+        },
+        "definition": "WITH tmp AS (\nSELECT ticker, count(*) as cnt, sum(quantity) as quantity\nFROM orders\nGROUP BY ticker\n)\nSELECT ticker FROM tmp WHERE quantity > 0 ORDER BY cnt\n",
+        "hide": 0,
+        "includeAll": true,
+        "label": "active_ticker",
+        "multi": true,
+        "name": "active_ticker",
+        "options": [],
+        "query": "WITH tmp AS (\nSELECT ticker, count(*) as cnt, sum(quantity) as quantity\nFROM orders\nGROUP BY ticker\n)\nSELECT ticker FROM tmp WHERE quantity > 0 ORDER BY cnt\n",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
       }
     ]
   },
   "time": {
-    "from": "now/y",
+    "from": "now-1y",
     "to": "now"
   },
   "timeRangeUpdatedDuringEditOrView": false,
@@ -1382,6 +1410,6 @@
   "timezone": "utc",
   "title": "PYRE",
   "uid": "pyre-dashboard",
-  "version": 18,
+  "version": 28,
   "weekStart": ""
 }
