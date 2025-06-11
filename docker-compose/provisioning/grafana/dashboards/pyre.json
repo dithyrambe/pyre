@@ -1385,14 +1385,14 @@
           "type": "grafana-postgresql-datasource",
           "uid": "pyre"
         },
-        "definition": "WITH tmp AS (\nSELECT ticker, count(*) as cnt, sum(quantity) as quantity\nFROM orders\nGROUP BY ticker\n)\nSELECT ticker FROM tmp WHERE quantity > 0 ORDER BY cnt\n",
+        "definition": "WITH tmp AS (\nSELECT ticker, count(*) as cnt, sum(quantity) as quantity\nFROM orders\nGROUP BY ticker\n)\nSELECT ticker FROM tmp WHERE quantity > 0 ORDER BY cnt DESC\n",
         "hide": 0,
         "includeAll": true,
         "label": "active_ticker",
         "multi": true,
         "name": "active_ticker",
         "options": [],
-        "query": "WITH tmp AS (\nSELECT ticker, count(*) as cnt, sum(quantity) as quantity\nFROM orders\nGROUP BY ticker\n)\nSELECT ticker FROM tmp WHERE quantity > 0 ORDER BY cnt\n",
+        "query": "WITH tmp AS (\nSELECT ticker, count(*) as cnt, sum(quantity) as quantity\nFROM orders\nGROUP BY ticker\n)\nSELECT ticker FROM tmp WHERE quantity > 0 ORDER BY cnt DESC\n",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -1410,6 +1410,6 @@
   "timezone": "utc",
   "title": "PYRE",
   "uid": "pyre-dashboard",
-  "version": 28,
+  "version": 30,
   "weekStart": ""
 }
