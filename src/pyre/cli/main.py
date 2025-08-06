@@ -5,12 +5,14 @@ import typer
 from pyre.simulation.constants import PACKAGE_NAME
 from pyre.cli.market import market
 from pyre.cli.order import order
+from pyre.cli.portfolio import portfolio
 from pyre.cli.simulate import app as simulate
 
 app = Typer(add_completion=False)
 app.add_typer(typer_instance=simulate, name="simulate")
 app.add_typer(typer_instance=market, name="market")
 app.add_typer(typer_instance=order, name="order")
+app.add_typer(typer_instance=portfolio, name="portfolio")
 
 console = Console()
 

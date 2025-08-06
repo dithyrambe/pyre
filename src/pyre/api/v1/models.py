@@ -17,3 +17,11 @@ class Order(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class Worth(BaseModel):
+    """
+    Worth data model
+    """
+
+    worth: float

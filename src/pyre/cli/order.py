@@ -1,25 +1,17 @@
 from typing import Optional
 
-from httpx import Client
 from typer import Typer
 import pandas as pd
 import typer
 import yaml
 
 from pyre.cli.helpers import render_table
-from pyre.config import config
+from pyre.cli.client import get_client
 
 
 ORDERS_KEY = "orders"
 
 order = Typer(add_completion=False)
-
-
-def _get_client() -> Client:
-    return Client(
-        base_url=f"{config.PYRE_ENDPOINT}/v1/orders",
-        headers={"X-API-Key": config.PYRE_API_KEY.get_secret_value()},
-    )
 
 
 @order.command()
@@ -31,7 +23,7 @@ def list(
     end_datetime: Optional[str] = typer.Option(None, help="End date filter (exclusive)"),
 ) -> None:
     """List all market orders passed"""
-    client = _get_client()
+    client = get_client("orders")
     response = client.get(
         "/",
         params={
@@ -55,7 +47,7 @@ def register(
     fees: float = typer.Option(0.0, "-f", "--fees", help="Broker fee"),
 ) -> None:
     """Register a passed market order."""
-    client = _get_client()
+    client = get_client("orders")
 
     order = {
         "id": id,
@@ -71,7 +63,7 @@ def register(
 @order.command()
 def bulk(file: str) -> None:
     """Insert stock market orders in bulk from yaml"""
-    client = _get_client()
+    client = get_client("orders")
 
     with open(file) as f:
         data = yaml.safe_load(f)
@@ -82,7 +74,7 @@ def bulk(file: str) -> None:
 @order.command()
 def delete(id: int) -> None:
     """Delete an order by its ID"""
-    client = _get_client()
+    client = get_client("orders")
     client.delete(f"/{id}")
 
 
@@ -93,7 +85,7 @@ def dump(
     ),
 ) -> None:
     """Dump all orders (for backup purposes)"""
-    client = _get_client()
+    client = get_client("orders")
 
     response = client.get("/")
     orders = response.json()

@@ -22,3 +22,12 @@ def get_db():
         yield session
     finally:
         session.close()
+
+
+def get_conn():
+    engine = create_engine()
+    conn = engine.connect()
+    try:
+        yield conn
+    finally:
+        conn.close()
