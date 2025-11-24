@@ -39,7 +39,7 @@ This will build and run a showcase including:
 
 To work with your data, you could either:
 
- - replace [demo orders.yaml](./docker-compose/config/orders.yaml) with your own data (every field is mandatory)
+ - Copy demo [orders.yaml.example](./docker-compose/config/orders.yaml.example) with your own data (every field is mandatory) and rename it `orders.yaml`
  - create your own, remove the init container from the stack and run `PYRE_ENDPOINT=http://localhost:8000 pyre order bulk your/own/orders.yaml`
 
 
