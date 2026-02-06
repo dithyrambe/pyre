@@ -15,6 +15,7 @@ services:
     depends_on:
       postgre:
         condition: service_healthy
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "python3", "-c", "import socket; s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.settimeout(5); s.connect(('localhost', 8000)); s.close()"]
       interval: 5s
@@ -32,6 +33,7 @@ services:
       PYRE_POLLING_INTERVAL: "30"
       _TYPER_STANDARD_TRACEBACK: 1
     entrypoint: ["pyre", "market", "refresh", "--forever"]
+    restart: unless-stopped
     depends_on:
       postgre:
         condition: service_healthy
@@ -46,6 +48,7 @@ services:
     entrypoint: ["pyre", "order", "bulk", "/config/orders.yaml"]
     volumes:
       - ./config:/config
+    restart: unless-stopped
     depends_on:
       api:
         condition: service_healthy
@@ -62,6 +65,7 @@ services:
       - pyre_postgre:/var/lib/postgresql/data/
     ports:
       - 5432:5432
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 5s
@@ -81,6 +85,7 @@ services:
       - ./provisioning/grafana:/etc/grafana/provisioning
     ports:
       - 3000:3000
+    restart: unless-stopped
 
 volumes:
   pyre_grafana:
